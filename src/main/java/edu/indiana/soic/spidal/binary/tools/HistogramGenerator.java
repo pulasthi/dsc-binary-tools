@@ -95,7 +95,9 @@ public class HistogramGenerator {
                     buffer = byteBuffer.asShortBuffer();
                     short[] shortArray = new short[numPoints];
                     ((ShortBuffer)buffer).get(shortArray);
-                    for (short i1 : shortArray) {
+                    for (int j = 0; j < shortArray.length; j++) {
+                        if(j < start || j > end) continue;
+                        short i1 = shortArray[j];
                         if(random.nextDouble() < prob){
                             printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                             count++;
