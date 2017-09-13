@@ -89,7 +89,7 @@ public class HistogramGenerator {
                 }
             }else{
                 double pointsInRange = (double)numPoints*(end-start+1);
-                double prob = numSamples*100/pointsInRange;
+                double prob = numSamples/pointsInRange;
                 System.out.printf("Prob :" + prob ) ;
                 int count = 0;
                 for (int i = 0; i <= (end - start); i++) {
@@ -112,7 +112,7 @@ public class HistogramGenerator {
                             printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                             count++;
                             if(count%10000 == 0) {
-                                System.out.println(count + " Current Point row :" + start + i + " col :" + j);
+                                System.out.println(count + " Current Point row :" + (start + i) + " col :" + j);
                             }
                         }
                     }
