@@ -80,11 +80,11 @@ public class HistogramGenerator {
                     short[] shortArray = new short[numPoints];
                     ((ShortBuffer)buffer).get(shortArray);
                     for (int j = 0; j < shortArray.length; j++) {
-                        if(j < start || j > end) continue;
+                        if(isRangeCol && j < start || j > end) continue;
                         short i1 = shortArray[j];
                         printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                         count++;
-                        if(count%10000 == 0) System.out.println(count);
+                        if(count%10000 == 0) System.out.println(count + " Current Point row :" + start + i + " col :" + j);
                     }
                 }
             }else{
@@ -101,7 +101,7 @@ public class HistogramGenerator {
                     short[] shortArray = new short[numPoints];
                     ((ShortBuffer)buffer).get(shortArray);
                     for (int j = 0; j < shortArray.length; j++) {
-                        if(j < start || j > end) continue;
+                        if(isRangeCol && j < start || j > end) continue;
                         short i1 = shortArray[j];
                         if(random.nextDouble() < prob){
                             if(count > numSamples) {
@@ -111,7 +111,9 @@ public class HistogramGenerator {
                             }
                             printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                             count++;
-                            if(count%10000 == 0) System.out.println(count);
+                            if(count%10000 == 0) {
+                                System.out.println(count + " Current Point row :" + start + i + " col :" + j);
+                            }
                         }
                     }
                 }
