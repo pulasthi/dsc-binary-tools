@@ -89,7 +89,7 @@ public class HistogramGenerator {
                 }
             }else{
                 double pointsInRange = numPoints*(end-start+1);
-                double prob = numSamples/pointsInRange;
+                double prob = numSamples/pointsInRange*100;
                 int count = 0;
                 for (int i = 0; i <= (end - start); i++) {
                     byteBuffer.clear();
@@ -105,6 +105,7 @@ public class HistogramGenerator {
                         if(random.nextDouble() < prob){
                             printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                             count++;
+                            if(count==numSamples) break;
                             if(count%10000 == 0) System.out.println(count);
                         }
                     }
