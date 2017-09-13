@@ -69,6 +69,8 @@ public class HistogramGenerator {
             Buffer buffer = null;
             if(!onlySample){
                 //Extract all points and write to text file as double values.
+                int count = 0;
+
                 for (int i = 0; i <= (end - start); i++) {
                     byteBuffer.clear();
                     rmaf.read(temp);
@@ -81,6 +83,8 @@ public class HistogramGenerator {
                         if(j < start || j > end) continue;
                         short i1 = shortArray[j];
                         printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
+                        count++;
+                        if(count%10000 == 0) System.out.println(count);
                     }
                 }
             }else{
@@ -101,6 +105,7 @@ public class HistogramGenerator {
                         if(random.nextDouble() < prob){
                             printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                             count++;
+                            if(count%10000 == 0) System.out.println(count);
                         }
                     }
                 }
