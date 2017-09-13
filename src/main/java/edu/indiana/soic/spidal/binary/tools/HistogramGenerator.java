@@ -101,7 +101,7 @@ public class HistogramGenerator {
                     short[] shortArray = new short[numPoints];
                     ((ShortBuffer)buffer).get(shortArray);
                     for (int j = 0; j < shortArray.length; j++) {
-                        if(isRangeCol && j < start || j > end) continue;
+                        if(j > start) continue; // changed for special
                         short i1 = shortArray[j];
                         if(random.nextDouble() < prob){
                             if(count > numSamples) {
