@@ -104,7 +104,11 @@ public class HistogramGenerator {
                         if(j < start || j > end) continue;
                         short i1 = shortArray[j];
                         if(random.nextDouble() < prob){
-                            if(count > numSamples) return;
+                            if(count > numSamples) {
+                                printWriter.flush();
+                                printWriter.close();
+                                return;
+                            }
                             printWriter.write(String.format("%.4f", (double)i1/Short.MAX_VALUE) + ",");
                             count++;
                             if(count%10000 == 0) System.out.println(count);
