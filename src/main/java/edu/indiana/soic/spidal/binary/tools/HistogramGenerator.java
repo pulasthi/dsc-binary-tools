@@ -90,6 +90,7 @@ public class HistogramGenerator {
             }else{
                 double pointsInRange = numPoints*(end-start+1);
                 double prob = numSamples/pointsInRange*100;
+                System.out.printf("Prob :" + prob ) ;
                 int count = 0;
                 for (int i = 0; i <= (end - start); i++) {
                     byteBuffer.clear();
