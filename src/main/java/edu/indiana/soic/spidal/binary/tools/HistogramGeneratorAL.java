@@ -29,7 +29,7 @@ public class HistogramGeneratorAL {
         if(onlySample) numSamples = Integer.valueOf(args[5]);
         //double pointsInRange = (double)numPoints*(end-start+1);
         //double prob = numSamples/pointsInRange;
-        double prob = 0.001;
+        double prob = 0.0002;
         Random random = new Random();
 
         try(BufferedReader br = Files.newBufferedReader(Paths.get(inFile))){
