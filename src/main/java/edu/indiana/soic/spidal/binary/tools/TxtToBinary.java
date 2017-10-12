@@ -21,26 +21,26 @@ public class TxtToBinary {
         String file = args[0];
         String outputfile = args[1];
         double total = 0.0;
+        int numPoints = Integer.parseInt(args[2]);
 
-        short input[] = new short[37*37];
+        short input[] = new short[numPoints*numPoints];
         int count = 0;
-        endianness =  args[2].equals("big") ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-
+        endianness =  args[3].equals("big") ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
         try(BufferedReader br = Files.newBufferedReader(Paths.get(file))){
             String line;
             while ((line = br.readLine()) != null){
-                line = line.replace(" ","");
-                String splits[] = line.split("\t");
+                String splits[] = line.split("\\s+");
                 for (int i = 0; i < splits.length; i++) {
                     String split = splits[i];
-                    total += Double.parseDouble(split);
-                    short tempval = ((short)(Math.abs(Double.parseDouble(split))*Short.MAX_VALUE));
-                    input[count*37 + i] = tempval;
+                    double tempd = Double.parseDouble(split)/10; // special case remove later
+                    total += tempd;
+                    short tempval = ((short)(Math.abs(tempd)*Short.MAX_VALUE));
+                    input[count*numPoints + i] = tempval;
                 }
                 count++;
             }
 
-            ByteBuffer byteBuffer = ByteBuffer.allocate(37*37*2);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(numPoints*numPoints*2);
             if(endianness.equals(ByteOrder.BIG_ENDIAN)){
                 byteBuffer.order(ByteOrder.BIG_ENDIAN);
             }else{

@@ -23,6 +23,7 @@ public class GenerateBinary {
 
         for (int i = 0; i < N*D; i++) {
             input[i] = Math.random();
+            System.out.println(input[i]);
         }
 
         try{
