@@ -46,13 +46,22 @@ public class HistogramGeneratorAL {
                         if(row > end || col > end) continue;
                         printWriter.write(AL + ",");
                         count++;
+                        if(count%10000 == 0) {
+                            System.out.println(count + "1. Current Point row :" + row + " col :" + col);
+                        }
                     }else{
                         if(row > end && col < end && col > start){
                             printWriter.write(AL + ",");
                             count++;
+                            if(count%10000 == 0) {
+                                System.out.println(count + "2. Current Point row :" + row + " col :" + col);
+                            }
                         }else if(row > start && row < end && col > end){
                             printWriter.write(AL + ",");
                             count++;
+                            if(count%10000 == 0) {
+                                System.out.println(count + "3. Current Point row :" + row + " col :" + col);
+                            }
                         }else{
                             continue;
                         }
@@ -63,7 +72,7 @@ public class HistogramGeneratorAL {
                         System.out.println("Count : " + count);
                         return;
                     }
-                }else{
+                }else if(!onlySample){
                     String splits[] = line.split("\\s+");
                     row = Integer.parseInt(splits[0]);
                     col = Integer.parseInt(splits[1]);
@@ -74,6 +83,9 @@ public class HistogramGeneratorAL {
 
                     printWriter.write(AL + ",");
                     count++;
+                    if(count%10000 == 0) {
+                        System.out.println(count + "All. Current Point row :" + row + " col :" + col);
+                    }
                     if(count > numSamples) {
                         printWriter.flush();
                         printWriter.close();
