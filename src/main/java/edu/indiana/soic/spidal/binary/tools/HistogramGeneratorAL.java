@@ -70,8 +70,16 @@ public class HistogramGeneratorAL {
                     AL = Integer.parseInt(splits[2]);
                     if(row < start || col < start) continue;
                     if(row > end || col > end) continue;
+
+
                     printWriter.write(AL + ",");
                     count++;
+                    if(count > numSamples) {
+                        printWriter.flush();
+                        printWriter.close();
+                        System.out.println("Count : " + count);
+                        return;
+                    }
                 }
             }
 
