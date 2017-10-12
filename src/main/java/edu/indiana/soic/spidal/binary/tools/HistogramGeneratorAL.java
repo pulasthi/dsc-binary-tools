@@ -26,7 +26,7 @@ public class HistogramGeneratorAL {
         int col;
         int AL;
         int count = 0;
-        if(onlySample) numSamples = Integer.valueOf(args[5]);
+        numSamples = Integer.valueOf(args[5]);
         //double pointsInRange = (double)numPoints*(end-start+1);
         //double prob = numSamples/pointsInRange;
         double prob = 0.0002;
