@@ -56,7 +56,7 @@ public class ClusterStatsGenerator {
             double[] intraMinAll = new double[clustermaprev.size()*clustermaprev.size()];
 
             Arrays.fill(interMax, Double.MIN_VALUE);
-            Arrays.fill(intraMin, Double.MAX_VALUE);
+            Arrays.fill(intraMin, 100.0);
 
 
             int globalRow = ParallelOps.procRowStartOffset;
