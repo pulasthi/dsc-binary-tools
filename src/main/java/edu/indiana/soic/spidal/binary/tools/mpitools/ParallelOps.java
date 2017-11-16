@@ -81,7 +81,7 @@ public class ParallelOps {
 
         /* Allocate basic buffers for communication */
         statBuffer = MPI.newByteBuffer(DoubleStatistics.extent);
-        doubleBuffer = MPI.newDoubleBuffer(20000);
+        doubleBuffer = MPI.newDoubleBuffer(100000);
         intBuffer = MPI.newIntBuffer(1);
 
         worldProcsComm = MPI.COMM_WORLD; //initializing MPI world communicator
