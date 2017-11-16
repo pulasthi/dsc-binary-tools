@@ -86,7 +86,9 @@ public class ClusterStatsGenerator {
                     intraAverage[curclus*totalClusters*2 + colclus*2 + 1] += 1;
                     //debug
                     if((curclus == 15 && colclus == 16) || (curclus == 16 && colclus == 15) ) cluster15count16++;
+
                     if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX){
+                        if(curclus == 0 && colclus == 211) Utils.printMessage("Found value ::::::::::::::" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
                         intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     }
 
@@ -102,7 +104,7 @@ public class ClusterStatsGenerator {
             Utils.printMessage("The total number of distance taken in cluster 15 : " + all1516);
             for (int i = 0; i < interMaxAll.length; i++) {
                 Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,interMaxAll[i]));
-                Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,0,intraMinAll[i*totalClusters]));
+                Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,1,intraMinAll[i*totalClusters + 1]));
             }
 
             //output statas
