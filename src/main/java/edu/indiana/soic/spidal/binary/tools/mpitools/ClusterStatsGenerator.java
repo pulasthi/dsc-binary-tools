@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
  */
 public class ClusterStatsGenerator {
     public static ByteOrder endianness;
+    public static final double INV_SHORT_MAX = 1.0 / Short.MAX_VALUE;
 
     public static void main(String[] args) {
         try{
@@ -52,22 +53,22 @@ public class ClusterStatsGenerator {
     }
 
     private static void calculateDistStats() throws MPIException {
-        int localCount = ParallelOps.PointDistances.length;
+        double localCount = ParallelOps.PointDistances.length;
         double localSum = 0.0;
         double localSum2 = 0.0;
         double origD = 0.0;
         for (int i = 0; i < localCount; i++) {
-            origD = ParallelOps.PointDistances[i]/Short.MAX_VALUE;
+            origD = ParallelOps.PointDistances[i]*INV_SHORT_MAX;
             localSum += origD;
         }
         for (int i = 0; i < ParallelOps.procRowCount; i++) {
             for (int j = 0; j < ParallelOps.globalColCount; j++) {
-                origD = ParallelOps.PointDistances[i*ParallelOps.globalColCount + j];
+                origD = ParallelOps.PointDistances[i*ParallelOps.globalColCount + j]*INV_SHORT_MAX;
                 localSum2 += origD;
             }
         }
 
-        int totalCount = ParallelOps.allReduce(localCount);
+        double totalCount = ParallelOps.allReduce(localCount);
         double totalSum = ParallelOps.allReduce(localSum);
         double totalSum2 = ParallelOps.allReduce(localSum2);
         Utils.printMessage(" The total count : " + totalCount + "\n TotalSum1 : " + totalSum + "\n TotalSum2" + totalSum2 );
