@@ -71,7 +71,7 @@ public class ClusterStatsGenerator {
         double totalCount = ParallelOps.allReduce(localCount);
         double totalSum = ParallelOps.allReduce(localSum);
         double totalSum2 = ParallelOps.allReduce(localSum2);
-        Utils.printMessage(" The total count : " + totalCount + "\n TotalSum1 : " + totalSum + "\n TotalSum2" + totalSum2 );
+        Utils.printMessage(String.format(" The total count : %.10f \n TotalSum1 : %.10f \n TotalSum2 : %.10f", totalCount, totalSum, totalSum2 ));
     }
 
     private static void readDistanceData(String distanceFile) {
