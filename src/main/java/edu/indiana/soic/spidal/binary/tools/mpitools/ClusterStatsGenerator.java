@@ -62,11 +62,11 @@ public class ClusterStatsGenerator {
                 for (Integer clusmember : clustermaprev.get(curclus)) {
                     if(clusmember <= globalRow) continue;
 
-                    interAverage[curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember];
+                    interAverage[curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX;
                     interAverage[curclus*2 + 1] += 1;
 
-                    if(inteMax[curclus] < ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]){
-                        inteMax[curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember];
+                    if(inteMax[curclus] < ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX){
+                        inteMax[curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX;
                     }
                     //debug
                     if(curclus == 15) cluster15count++;
