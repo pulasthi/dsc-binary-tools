@@ -80,9 +80,10 @@ public class ClusterStatsGenerator {
     }
 
     private static void readDistanceData(String distanceFile) {
+
         BinaryReader1D.readRowRange(distanceFile, ParallelOps.procRowRange,
                 ParallelOps.globalColCount, endianness, true,
-                null, 1, ParallelOps.PointDistances);
+                null, ParallelOps.PointDistances);
     }
 
     private static void readClusterFile(String clusterFile, Map<Integer, Integer> clustermap) {
