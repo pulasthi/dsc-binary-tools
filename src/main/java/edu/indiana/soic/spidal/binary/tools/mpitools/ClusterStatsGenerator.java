@@ -47,15 +47,23 @@ public class ClusterStatsGenerator {
             //Data structures to keep calculations
             double[] interAverage = new double[clustermaprev.size()*2];
             double[] interAverageAll = new double[clustermaprev.size()*2];
-            double[] inteMax = new double[clustermaprev.size()];
-            double[] inteMaxAll = new double[clustermaprev.size()];
-            Arrays.fill(inteMax, Double.MIN_VALUE);
+            double[] interMax = new double[clustermaprev.size()];
+            double[] interMaxAll = new double[clustermaprev.size()];
+
+            double[] intraAverage = new double[clustermaprev.size()*clustermaprev.size()*2];
+            double[] intraMin = new double[clustermaprev.size()*clustermaprev.size()];
+            double[] intraAverageAll = new double[clustermaprev.size()*clustermaprev.size()*2];
+            double[] intraMinAll = new double[clustermaprev.size()*clustermaprev.size()];
+
+            Arrays.fill(interMax, Double.MIN_VALUE);
+            Arrays.fill(intraMin, Double.MAX_VALUE);
 
 
             int globalRow = ParallelOps.procRowStartOffset;
             int curclus;
+            int totalClusters = clustermaprev.size();
             //debug
-            int cluster15count = 0;
+            int cluster15count16 = 0;
             for (int localRow = 0; localRow < ParallelOps.procRowCount; localRow++) {
                 globalRow = ParallelOps.procRowStartOffset + localRow;
                 curclus = clustermap.get(globalRow);
@@ -65,22 +73,36 @@ public class ClusterStatsGenerator {
                     interAverage[curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX;
                     interAverage[curclus*2 + 1] += 1;
 
-                    if(inteMax[curclus] < ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX){
-                        inteMax[curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX;
+                    if(interMax[curclus] < ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX){
+                        interMax[curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]*INV_SHORT_MAX;
                     }
-                    //debug
-                    if(curclus == 15) cluster15count++;
+                }
+                int colclus;
 
+                for (int col = 0; col < ParallelOps.globalColCount; col++) {
+                    if(col <= globalRow) continue;
+                    colclus = clustermap.get(col);
+                    intraAverage[curclus*totalClusters*2 + colclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
+                    intraAverage[curclus*totalClusters*2 + colclus*2 + 1] += 1;
+                    //debug
+                    if(curclus == 15 && colclus == 16) cluster15count16++;
+                    if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX){
+                        intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
+                    }
 
                 }
             }
 
             ParallelOps.allReduceBuff(interAverage, MPI.SUM, interAverageAll);
-            ParallelOps.allReduceBuff(inteMax, MPI.MAX, inteMaxAll);
-            int all15 = ParallelOps.allReduce(cluster15count);
-            Utils.printMessage("The total number of distance taken in cluster 15 : " + all15);
-            for (int i = 0; i < inteMaxAll.length; i++) {
-                Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,inteMax[i]));
+            ParallelOps.allReduceBuff(interMax, MPI.MAX, interMaxAll);
+            ParallelOps.allReduceBuff(intraAverage, MPI.SUM, intraAverageAll);
+            ParallelOps.allReduceBuff(intraMin, MPI.MIN, intraMinAll);
+
+            int all1516 = ParallelOps.allReduce(cluster15count16);
+            Utils.printMessage("The total number of distance taken in cluster 15 : " + all1516);
+            for (int i = 0; i < interMaxAll.length; i++) {
+                Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,interMaxAll[i]));
+                Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,0,intraMinAll[i*totalClusters]));
             }
 
             //output statas
