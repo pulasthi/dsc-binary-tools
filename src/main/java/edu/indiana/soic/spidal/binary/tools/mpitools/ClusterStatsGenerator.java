@@ -65,7 +65,7 @@ public class ClusterStatsGenerator {
                     interAverage[curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember];
                     interAverage[curclus*2 + 1] += 1;
 
-                    if(inteMax[curclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]){
+                    if(inteMax[curclus] < ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]){
                         inteMax[curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember];
                     }
                     //debug
@@ -78,7 +78,7 @@ public class ClusterStatsGenerator {
             ParallelOps.allReduceBuff(interAverage, MPI.SUM, interAverageAll);
             ParallelOps.allReduceBuff(inteMax, MPI.MAX, inteMaxAll);
             int all15 = ParallelOps.allReduce(cluster15count);
-            System.out.println("The total number of distance taken in cluster 15 : " + all15);
+            Utils.printMessage("The total number of distance taken in cluster 15 : " + all15);
             for (int i = 0; i < inteMaxAll.length; i++) {
                 Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,inteMax[i]));
             }
