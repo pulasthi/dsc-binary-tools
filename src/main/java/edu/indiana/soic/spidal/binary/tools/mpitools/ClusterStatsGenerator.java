@@ -56,10 +56,14 @@ public class ClusterStatsGenerator {
         double localCount = ParallelOps.PointDistances.length;
         double localSum = 0.0;
         double localSum2 = 0.0;
+        double localMax = Double.MIN_VALUE;
         double origD = 0.0;
         for (int i = 0; i < localCount; i++) {
             origD = ParallelOps.PointDistances[i]*INV_SHORT_MAX;
-            localSum += origD;
+            if(origD > 0) localSum += origD;
+            if(origD > localMax){
+                localMax = origD;
+            }
         }
         for (int i = 0; i < ParallelOps.procRowCount; i++) {
             for (int j = 0; j < ParallelOps.globalColCount; j++) {
@@ -71,7 +75,8 @@ public class ClusterStatsGenerator {
         double totalCount = ParallelOps.allReduce(localCount);
         double totalSum = ParallelOps.allReduce(localSum);
         double totalSum2 = ParallelOps.allReduce(localSum2);
-        Utils.printMessage(String.format(" The total count : %.10f \n TotalSum1 : %.10f \n TotalSum2 : %.10f", totalCount, totalSum, totalSum2 ));
+        double max = ParallelOps.allReduceMax(localMax);
+        Utils.printMessage(String.format(" The total count : %.10f \n TotalSum1 : %.10f \n TotalSum2 : %.10f \n Max :  %.10f", totalCount, totalSum, totalSum2, max ));
     }
 
     private static void readDistanceData(String distanceFile) {
