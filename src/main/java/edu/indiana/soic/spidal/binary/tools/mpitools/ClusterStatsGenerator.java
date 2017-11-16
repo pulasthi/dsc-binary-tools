@@ -67,7 +67,7 @@ public class ClusterStatsGenerator {
         }
         for (int i = 0; i < ParallelOps.procRowCount; i++) {
             for (int j = 0; j < ParallelOps.globalColCount; j++) {
-                origD = ParallelOps.PointDistances[i*ParallelOps.globalColCount + j]*INV_SHORT_MAX;
+                origD = ((double)ParallelOps.PointDistances[i*ParallelOps.globalColCount + j])*INV_SHORT_MAX;
                 localSum2 += origD;
             }
         }
