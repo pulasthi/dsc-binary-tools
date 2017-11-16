@@ -104,17 +104,21 @@ public class ClusterStatsGenerator {
             Utils.printMessage("The total number of distance taken in cluster 15 : " + all1516);
             for (int i = 0; i < interMaxAll.length; i++) {
                 Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,interMaxAll[i]));
-                Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,1,intraMinAll[i*totalClusters + 1]));
+                Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,0,intraMinAll[i*totalClusters]));
+                Utils.printMessage(String.format("0 Cluster %d and %d : Min : %.4f", i,0,intraMin[i*totalClusters]));
             }
 
             //output statas
             calculateDistStats();
 
+            ParallelOps.tearDownParallelism();
         } catch (MPIException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
 
     }
 
