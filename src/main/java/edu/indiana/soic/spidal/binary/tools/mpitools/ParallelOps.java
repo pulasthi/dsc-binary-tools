@@ -81,7 +81,7 @@ public class ParallelOps {
 
         /* Allocate basic buffers for communication */
         statBuffer = MPI.newByteBuffer(DoubleStatistics.extent);
-        doubleBuffer = MPI.newDoubleBuffer(1);
+        doubleBuffer = MPI.newDoubleBuffer(2);
         intBuffer = MPI.newIntBuffer(1);
 
         worldProcsComm = MPI.COMM_WORLD; //initializing MPI world communicator
@@ -178,6 +178,22 @@ public class ParallelOps {
         intBuffer.put(0, value);
         worldProcsComm.allReduce(intBuffer, 1, MPI.INT, MPI.SUM);
         return intBuffer.get(0);
+    }
+
+    public static void allReduce(double [] values, Op reduceOp, Intracomm comm) throws MPIException {
+        comm.allReduce(values, values.length, MPI.DOUBLE, reduceOp);
+    }
+
+    public static  void allReduceBuff(double [] values, Op reduceOp, double[] result) throws MPIException{
+        allReduceBuff(values, reduceOp, worldProcsComm, result);
+    }
+
+    public static void allReduceBuff(double [] values, Op reduceOp, Intracomm comm,  double[] result) throws MPIException {
+        doubleBuffer.clear();
+        doubleBuffer.put(values,0,values.length);
+        comm.allReduce(doubleBuffer, values.length, MPI.DOUBLE, reduceOp);
+        doubleBuffer.flip();
+        doubleBuffer.get(result);
     }
 
     public static void allGather() throws MPIException {

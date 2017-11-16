@@ -2,13 +2,17 @@ package edu.indiana.soic.spidal.binary.tools.mpitools;
 
 import edu.indiana.soic.spidal.common.BinaryReader1D;
 import edu.indiana.soic.spidal.common.DoubleStatistics;
+import mpi.MPI;
 import mpi.MPIException;
 
+import javax.rmi.CORBA.Util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -35,11 +39,49 @@ public class ClusterStatsGenerator {
 
             //read clusters and store in Hashmap
             Map<Integer, Integer> clustermap = new HashMap<Integer, Integer>();
-            readClusterFile(clusterFile,clustermap);
+            Map<Integer, ArrayList<Integer>> clustermaprev = new HashMap<Integer, ArrayList<Integer>>();
+            readClusterFile(clusterFile,clustermap, clustermaprev);
             //read data from bin file
+            readDistanceData(distanceFile);
 
             //Data structures to keep calculations
-            readDistanceData(distanceFile);
+            double[] interAverage = new double[clustermaprev.size()*2];
+            double[] interAverageAll = new double[clustermaprev.size()*2];
+            double[] inteMax = new double[clustermaprev.size()];
+            double[] inteMaxAll = new double[clustermaprev.size()];
+            Arrays.fill(inteMax, Double.MIN_VALUE);
+
+
+            int globalRow = ParallelOps.procRowStartOffset;
+            int curclus;
+            //debug
+            int cluster15count = 0;
+            for (int localRow = 0; localRow < ParallelOps.procRowCount; localRow++) {
+                globalRow = ParallelOps.procRowStartOffset + localRow;
+                curclus = clustermap.get(globalRow);
+                for (Integer clusmember : clustermaprev.get(curclus)) {
+                    if(clusmember <= globalRow) continue;
+
+                    interAverage[curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember];
+                    interAverage[curclus*2 + 1] += 1;
+
+                    if(inteMax[curclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember]){
+                        inteMax[curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + clusmember];
+                    }
+                    //debug
+                    if(curclus == 15) cluster15count++;
+
+
+                }
+            }
+
+            ParallelOps.allReduceBuff(interAverage, MPI.SUM, interAverageAll);
+            ParallelOps.allReduceBuff(inteMax, MPI.MAX, inteMaxAll);
+            int all15 = ParallelOps.allReduce(cluster15count);
+            System.out.println("The total number of distance taken in cluster 15 : " + all15);
+            for (int i = 0; i < inteMaxAll.length; i++) {
+                Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,inteMax[i]));
+            }
 
             //output statas
             calculateDistStats();
@@ -86,13 +128,17 @@ public class ClusterStatsGenerator {
                 null, ParallelOps.PointDistances);
     }
 
-    private static void readClusterFile(String clusterFile, Map<Integer, Integer> clustermap) {
+    private static void readClusterFile(String clusterFile, Map<Integer, Integer> clustermap, Map<Integer, ArrayList<Integer>> clustermapRev) {
         String line = null;
         Pattern pattern = Pattern.compile("[\t]");
         try(BufferedReader br = Files.newBufferedReader(Paths.get(clusterFile))){
             while ((line = br.readLine()) != null){
                 String[] splits = pattern.split(line);
-                clustermap.put(Integer.valueOf(splits[0]),Integer.valueOf(splits[1]));
+                int index = Integer.valueOf(splits[0]);
+                int cluster = Integer.valueOf(splits[1]);
+                clustermap.put(index,cluster);
+                if(!clustermapRev.containsKey(cluster)) clustermapRev.put(cluster, new ArrayList<Integer>());
+                clustermapRev.get(cluster).add(index);
             }
         } catch (IOException e) {
             e.printStackTrace();
