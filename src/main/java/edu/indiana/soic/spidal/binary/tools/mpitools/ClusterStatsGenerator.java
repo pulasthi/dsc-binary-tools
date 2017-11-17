@@ -106,12 +106,12 @@ public class ClusterStatsGenerator {
             int all1516 = ParallelOps.allReduce(cluster15count16);
             Utils.printMessage("The total number of distance taken in cluster 15 : " + all1516);
             for (int i = 0; i < interMaxAll.length; i++) {
-                Utils.printMessage(String.format("Cluster %d : Max : %.4f", i,interMaxAll[i]));
-                Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,0,intraMinAll[i*totalClusters]));
-                Utils.printMessage(String.format("0 Cluster %d and %d : Min : %.4f", i,0,intraMin[i*totalClusters]));
+                Utils.printMessage(String.format("Cluster %d : Max : %.14f", i,interMaxAll[i]));
+                Utils.printMessage(String.format("Cluster %d and %d : Min : %.10f", i,0,intraMinAll[i*totalClusters]));
+                Utils.printMessage(String.format("0 Cluster %d and %d : Min : %.10f", i,0,intraMin[i*totalClusters]));
             }
 
-            Utils.printMessage("symetry chkeck" +  (intraMinAll[2] == intraMinAll[totalClusters+2]));
+            Utils.printMessage("symetry chkeck" +  (intraMinAll[2] == intraMinAll[2*totalClusters]));
             Utils.printMessage("symetry chkeck" +  (intraMinAll[12*totalClusters + 2] == intraMinAll[2*totalClusters+12]));
 
             //output statas
