@@ -92,7 +92,8 @@ public class ClusterStatsGenerator {
                     if((curclus == 15 && colclus == 16) || (curclus == 16 && colclus == 15) ) cluster15count16++;
                     // need to add to both sides
                     if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX){
-                        if(curclus == 0 && colclus == 211) Utils.printMessage("Found value ::::::::::::::" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
+                        if(curclus == 5 && colclus == 66) Utils.printMessage("Found value :::::::::::::: 5 66" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
+                        if(curclus == 6 && colclus == 52) Utils.printMessage("Found value :::::::::::::: 5 66" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
                         intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                         intraMin[colclus*totalClusters + curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     }
