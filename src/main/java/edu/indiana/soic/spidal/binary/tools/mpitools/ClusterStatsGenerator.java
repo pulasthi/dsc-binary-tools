@@ -7,7 +7,9 @@ import mpi.MPIException;
 
 import javax.rmi.CORBA.Util;
 import java.io.BufferedReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.ByteOrder;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -113,6 +115,44 @@ public class ClusterStatsGenerator {
 
             Utils.printMessage("symetry chkeck" +  (intraMinAll[2] == intraMinAll[2*totalClusters]));
             Utils.printMessage("symetry chkeck" +  (intraMinAll[12*totalClusters + 2] == intraMinAll[2*totalClusters+12]));
+
+            //Write the results to a file
+            if(ParallelOps.worldProcRank == 0){
+                PrintWriter printWriterintra = new PrintWriter(new FileWriter(outFile + "_intraa.csv"));
+                PrintWriter printWriterinterAv= new PrintWriter(new FileWriter(outFile + "_interAverage.csv"));
+                PrintWriter printWriterinterMin = new PrintWriter(new FileWriter(outFile + "_interMin.csv"));
+
+                //Inter cluster
+                printWriterintra.println("Cluster,Average,Max");
+                for (int i = 0; i < intraMinAll.length; i++) {
+                    if(i > 210) continue; // do not need dust and referance points
+                    printWriterintra.printf("%d,%0.6f,%0.6f", i, interAverageAll[i*2]/interAverageAll[i*2 + 1], interMaxAll[i]);
+                }
+
+                //Intra average
+                for (int i = 0; i < intraMinAll.length; i++) {
+                    if(i > 210) continue; // do not need dust and referance points
+                    for (int j = 0; j < intraMinAll.length; j++) {
+                        if(i > 210) continue; // do not need dust and referance points
+                        printWriterinterAv.print(intraAverageAll[i*totalClusters*2 + j*2]/intraAverageAll[i*totalClusters*2 + j*2 + 1] + ",");
+                    }
+                    printWriterinterAv.println();
+                }
+
+                //Intra Min
+                for (int i = 0; i < intraMinAll.length; i++) {
+                    if(i > 210) continue; // do not need dust and referance points
+                    for (int j = 0; j < intraMinAll.length; j++) {
+                        if(i > 210) continue; // do not need dust and referance points
+                        printWriterinterAv.print(intraMinAll[i*totalClusters + j] + ",");
+                    }
+                    printWriterinterAv.println();
+                }
+
+                printWriterinterAv.close();
+                printWriterinterMin.close();
+                printWriterintra.close();
+            }
 
             //output statas
             calculateDistStats();
