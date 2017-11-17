@@ -124,26 +124,26 @@ public class ClusterStatsGenerator {
 
                 //Inter cluster
                 printWriterintra.println("Cluster,Average,Max");
-                for (int i = 0; i < intraMinAll.length; i++) {
+                for (int i = 0; i < totalClusters; i++) {
                     if(i > 210) continue; // do not need dust and referance points
                     printWriterintra.printf("%d,%.6f,%.6f", i, interAverageAll[i*2]/interAverageAll[i*2 + 1], interMaxAll[i]);
                 }
 
                 //Intra average
-                for (int i = 0; i < intraMinAll.length; i++) {
+                for (int i = 0; i < totalClusters; i++) {
                     if(i > 210) continue; // do not need dust and referance points
-                    for (int j = 0; j < intraMinAll.length; j++) {
-                        if(i > 210) continue; // do not need dust and referance points
+                    for (int j = 0; j < totalClusters; j++) {
+                        if(j > 210) continue; // do not need dust and referance points
                         printWriterinterAv.print(intraAverageAll[i*totalClusters*2 + j*2]/intraAverageAll[i*totalClusters*2 + j*2 + 1] + ",");
                     }
                     printWriterinterAv.println();
                 }
 
                 //Intra Min
-                for (int i = 0; i < intraMinAll.length; i++) {
+                for (int i = 0; i < totalClusters; i++) {
                     if(i > 210) continue; // do not need dust and referance points
-                    for (int j = 0; j < intraMinAll.length; j++) {
-                        if(i > 210) continue; // do not need dust and referance points
+                    for (int j = 0; j < totalClusters; j++) {
+                        if(j > 210) continue; // do not need dust and referance points
                         printWriterinterAv.print(intraMinAll[i*totalClusters + j] + ",");
                     }
                     printWriterinterAv.println();
