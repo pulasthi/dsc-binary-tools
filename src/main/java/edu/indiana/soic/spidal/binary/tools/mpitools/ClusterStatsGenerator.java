@@ -84,12 +84,15 @@ public class ClusterStatsGenerator {
                     colclus = clustermap.get(col);
                     intraAverage[curclus*totalClusters*2 + colclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     intraAverage[curclus*totalClusters*2 + colclus*2 + 1] += 1;
+                    intraAverage[colclus*totalClusters*2 + curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
+                    intraAverage[colclus*totalClusters*2 + curclus*2 + 1] += 1;
                     //debug
                     if((curclus == 15 && colclus == 16) || (curclus == 16 && colclus == 15) ) cluster15count16++;
-
+                    // need to add to both sides
                     if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX){
                         if(curclus == 0 && colclus == 211) Utils.printMessage("Found value ::::::::::::::" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
                         intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
+                        intraMin[colclus*totalClusters + curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     }
 
                 }
@@ -107,6 +110,9 @@ public class ClusterStatsGenerator {
                 Utils.printMessage(String.format("Cluster %d and %d : Min : %.4f", i,0,intraMinAll[i*totalClusters]));
                 Utils.printMessage(String.format("0 Cluster %d and %d : Min : %.4f", i,0,intraMin[i*totalClusters]));
             }
+
+            Utils.printMessage("symetry chkeck" +  (intraMinAll[2] == intraMinAll[totalClusters+2]));
+            Utils.printMessage("symetry chkeck" +  (intraMinAll[12*totalClusters + 2] == intraMinAll[2*totalClusters+12]));
 
             //output statas
             calculateDistStats();
