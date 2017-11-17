@@ -126,7 +126,7 @@ public class ClusterStatsGenerator {
                 printWriterintra.println("Cluster,Average,Max");
                 for (int i = 0; i < totalClusters; i++) {
                     if(i > 210) continue; // do not need dust and referance points
-                    printWriterintra.printf("%d,%.6f,%.6f", i, interAverageAll[i*2]/interAverageAll[i*2 + 1], interMaxAll[i]);
+                    printWriterintra.printf("%d,%.6f,%.6f \n", i, interAverageAll[i*2]/interAverageAll[i*2 + 1], interMaxAll[i]);
                 }
 
                 //Intra average
