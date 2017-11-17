@@ -144,9 +144,9 @@ public class ClusterStatsGenerator {
                     if(i > 210) continue; // do not need dust and referance points
                     for (int j = 0; j < totalClusters; j++) {
                         if(j > 210) continue; // do not need dust and referance points
-                        printWriterinterAv.print(intraMinAll[i*totalClusters + j] + ",");
+                        printWriterinterMin.print(intraMinAll[i*totalClusters + j] + ",");
                     }
-                    printWriterinterAv.println();
+                    printWriterinterMin.println();
                 }
 
                 printWriterinterAv.close();
