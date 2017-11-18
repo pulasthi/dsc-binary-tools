@@ -91,15 +91,22 @@ public class ClusterStatsGenerator {
                     //debug
                     if((curclus == 15 && colclus == 16) || (curclus == 16 && colclus == 15) ) cluster15count16++;
                     // need to add to both sides
-                    if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX){
-                        if(curclus == 5 && colclus == 66) Utils.printMessage("Found value :::::::::::::: 5 66" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
-                        if(curclus == 6 && colclus == 52) Utils.printMessage("Found value :::::::::::::: 5 66" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
+                    if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX && ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX > 0){
+                        if(curclus == 66 && colclus == 5){
+//                            if(ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX == 0.0){
+//                                System.out.println("Found value :::::::::::::: 5 66 : " + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
+//                                System.out.printf("row %d and col %d", globalRow, col);
+//                                System.out.printf("value  %d", ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]);
+//                            }
+                        }
+//                        if(curclus == 6 && colclus == 52) Utils.printMessage("Found value :::::::::::::: 5 66" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
                         intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                         intraMin[colclus*totalClusters + curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     }
 
                 }
             }
+            //if(intraMin[66*totalClusters + 5] == 0.0) System.out.println("Got a zero here" + ParallelOps.worldProcRank);
 
             ParallelOps.allReduceBuff(interAverage, MPI.SUM, interAverageAll);
             ParallelOps.allReduceBuff(interMax, MPI.MAX, interMaxAll);
