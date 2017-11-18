@@ -89,20 +89,16 @@ public class ClusterStatsGenerator {
                     intraAverage[colclus*totalClusters*2 + curclus*2] += ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     intraAverage[colclus*totalClusters*2 + curclus*2 + 1] += 1;
                     //debug
-                    if((curclus == 15 && colclus == 16) || (curclus == 16 && colclus == 15) ) cluster15count16++;
                     // need to add to both sides
-                    if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX && ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX > 0){
-                        if(curclus == 66 && colclus == 5){
-//                            if(ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX == 0.0){
-//                                System.out.println("Found value :::::::::::::: 5 66 : " + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
-//                                System.out.printf("row %d and col %d", globalRow, col);
-//                                System.out.printf("value  %d", ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]);
-//                            }
-                        }
-//                        if(curclus == 6 && colclus == 52) Utils.printMessage("Found value :::::::::::::: 5 66" + ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX);
+                    if(colclus == curclus) intraMin[colclus*totalClusters + curclus] =0;
+                    
+                    if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX &&
+                            ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX > 0){
                         intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                         intraMin[colclus*totalClusters + curclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
                     }
+
+
 
                 }
             }
