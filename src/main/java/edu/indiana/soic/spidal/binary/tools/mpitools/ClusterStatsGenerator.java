@@ -90,8 +90,11 @@ public class ClusterStatsGenerator {
                     intraAverage[colclus*totalClusters*2 + curclus*2 + 1] += 1;
                     //debug
                     // need to add to both sides
-                    if(colclus == curclus) intraMin[colclus*totalClusters + curclus] =0;
-                    
+                    if(colclus == curclus) {
+                        intraMin[colclus*totalClusters + curclus] = 0;
+                        intraAverage[colclus*totalClusters*2 + curclus*2] = 0;
+                    }
+
                     if(intraMin[curclus*totalClusters + colclus] > ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX &&
                             ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX > 0){
                         intraMin[curclus*totalClusters + colclus] = ParallelOps.PointDistances[localRow*ParallelOps.globalColCount + col]*INV_SHORT_MAX;
