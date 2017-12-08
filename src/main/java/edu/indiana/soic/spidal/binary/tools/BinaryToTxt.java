@@ -73,6 +73,13 @@ public class BinaryToTxt {
                     }
                     for (int i = 0; i < numPoints; i++) {
                         for (int j = 0; j < numPoints; j++) {
+                            if(i*numPoints + j < j*numPoints + i){
+                                doubleArray[i*numPoints +j] = doubleArray[j*numPoints + i];
+                            }
+                            if(doubleArray[i*numPoints + j] == 0 && i != j){
+                                doubleArray[i*numPoints +j] = 3.051850947599719E-5;
+                                doubleArray[j*numPoints +i] = 3.051850947599719E-5;
+                            }
                             outWriter.printf("%.6f",doubleArray[i*numPoints + j]);
                             if(j < numPoints - 1){
                                 outWriter.print(",");
@@ -109,7 +116,7 @@ public class BinaryToTxt {
                             byteBuffer.order(ByteOrder.BIG_ENDIAN);
                     break;
             }
-
+            System.out.println(numPoints);
            outWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
