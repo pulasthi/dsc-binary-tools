@@ -63,6 +63,8 @@
                     </descriptorRefs>
                     <archive>
                         <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>edu.indiana.soic.spidal.binary.tools.BinaryToTxt</mainClass>
                         </manifest>
                     </archive>
                     <finalName>dsc-binary-tools</finalName>
