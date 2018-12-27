@@ -24,30 +24,8 @@ public class SparseBinFileCreator {
         endianness = args[5].equals("big") ? ByteOrder.BIG_ENDIAN :
                 ByteOrder.LITTLE_ENDIAN;
 
-        switch (args[4]) {
-            case "short":
-                dataTypeSize = Short.BYTES;
-                break;
-            case "int":
-                dataTypeSize = Integer.BYTES;
-                break;
-            case "double":
-                dataTypeSize = Double.BYTES;
-                break;
-            case "long":
-                dataTypeSize = Long.BYTES;
-                break;
-            case "float":
-                dataTypeSize = Float.BYTES;
-                break;
-            case "byte":
-                dataTypeSize = Byte.BYTES;
-                break;
-            default:
-                dataTypeSize = Short.BYTES;
-        }
         extract(inputFile, inputFilew, outFileIndex, outFileData, numPoints, endianness,
-                args[5]);
+                args[6]);
     }
 
     private static void extract(String inputFile, String inputFilew,
@@ -78,7 +56,7 @@ public class SparseBinFileCreator {
             Buffer bufferdata = null;
             Buffer bufferweight = null;
 
-            List<Double> outData = new ArrayList();
+            List<Short> outData = new ArrayList();
             List<Integer> outIndex = new ArrayList();
 
             switch (dataType) {
@@ -96,14 +74,14 @@ public class SparseBinFileCreator {
                         int row = i / numPoints;
                         int col = i % numPoints;
                         if(shortArrayweight[i] > 0){
-                            outData.add((double)shortArraydata[i]/Short.MAX_VALUE);
+                            outData.add(shortArraydata[i]);
                             outIndex.add(row);
                             outIndex.add(col);
                         }
                     }
             }
 
-            double[] outputdata = new double[outData.size()];
+            short[] outputdata = new short[outData.size()];
             for (int i = 0; i < outputdata.length; i++) {
                 outputdata[i] = outData.get(i);
             }
@@ -114,7 +92,7 @@ public class SparseBinFileCreator {
             }
 
             ByteBuffer outbyteBufferdata =
-                    ByteBuffer.allocate(outputdata.length * 8);
+                    ByteBuffer.allocate(outputdata.length * 2);
             ByteBuffer outbyteBufferindex =
                     ByteBuffer.allocate(outputindex.length * 4);
             if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
@@ -127,9 +105,9 @@ public class SparseBinFileCreator {
             outbyteBufferdata.clear();
             outbyteBufferindex.clear();
 
-            DoubleBuffer doubleOutputBuffer =
-                    outbyteBufferdata.asDoubleBuffer();
-            doubleOutputBuffer.put(outputdata);
+            ShortBuffer shortOutputBuffer =
+                    outbyteBufferdata.asShortBuffer();
+            shortOutputBuffer.put(outputdata);
 
             IntBuffer intOutputBuffer = outbyteBufferindex.asIntBuffer();
             intOutputBuffer.put(outputindex);
