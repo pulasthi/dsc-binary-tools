@@ -53,7 +53,6 @@ public class ExtractFromBin {
                 .newByteChannel(Paths.get(inputFile), StandardOpenOption.READ)) {
             ByteBuffer byteBuffer = ByteBuffer.allocate((int)fc.size());
             PrintWriter printWriter = new PrintWriter(new FileWriter(outFile));
-
             if(endianness.equals(ByteOrder.BIG_ENDIAN)){
                 byteBuffer.order(ByteOrder.BIG_ENDIAN);
             }else{
