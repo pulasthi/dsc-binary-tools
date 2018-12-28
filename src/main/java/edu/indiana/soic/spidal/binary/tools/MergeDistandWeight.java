@@ -69,7 +69,7 @@ public class MergeDistandWeight {
 
 
             ByteBuffer outbyteBufferdata =
-                    ByteBuffer.allocate(shortArraydata.length * 8);
+                    ByteBuffer.allocate(shortArraydata.length * 2);
 
             if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
                 outbyteBufferdata.order(ByteOrder.BIG_ENDIAN);
