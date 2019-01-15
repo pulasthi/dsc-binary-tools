@@ -13,6 +13,7 @@ import java.util.List;
 public class SparseBinFileCreator {
     private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
     private static int dataTypeSize = Short.BYTES;
+    private static int chunkSize = 10000000;
 
     public static void main(String[] args) {
         String inputFile = args[0];
@@ -53,76 +54,89 @@ public class SparseBinFileCreator {
             byteBufferdata.flip();
             byteBufferweight.flip();
 
+            FileChannel outIndexfile =
+                    new FileOutputStream(outFileIndex).getChannel();
+
+            FileChannel outDatafile =
+                    new FileOutputStream(outFiledata).getChannel();
+
             Buffer bufferdata = null;
             Buffer bufferweight = null;
 
             List<Short> outData = new ArrayList();
             List<Integer> outIndex = new ArrayList();
+            long size = fcdata.size()/2;
+            long currentCount = 0;
+            int indexCount = 0;
+            bufferdata = byteBufferdata.asShortBuffer();
+            bufferweight = byteBufferweight.asShortBuffer();
 
-            switch (dataType) {
-                case "short":
-                    bufferdata = byteBufferdata.asShortBuffer();
-                    short[] shortArraydata = new short[(int)fcdata.size()/2];
-                    ((ShortBuffer)bufferdata).get(shortArraydata);
+            while (currentCount < size){
+                outData = new ArrayList();
+                outIndex = new ArrayList();
+                int currentChunk = (size - currentCount) < chunkSize ? (int)(size-currentCount) : chunkSize;
 
-                    bufferweight = byteBufferweight.asShortBuffer();
-                    short[] shortArrayweight =
-                            new short[(int)fcweight.size()/2];
-                    ((ShortBuffer)bufferweight).get(shortArrayweight);
+                switch (dataType) {
+                    case "short":
+                        short[] shortArraydata = new short[currentChunk];
+                        ((ShortBuffer)bufferdata).get(shortArraydata);
 
-                    for (int i = 0; i < shortArraydata.length; i++) {
-                        int row = i / numPoints;
-                        int col = i % numPoints;
-                        if(shortArrayweight[i] > 0){
-                            outData.add(shortArraydata[i]);
-                            outIndex.add(row);
-                            outIndex.add(col);
+                        short[] shortArrayweight =
+                                new short[currentChunk];
+                        ((ShortBuffer)bufferweight).get(shortArrayweight);
+                        for (int i = 0; i < shortArraydata.length; i++) {
+                            int row = (i + indexCount) / numPoints;
+                            int col = (i + indexCount) % numPoints;
+                            if(shortArrayweight[i] > 0){
+                                outData.add(shortArraydata[i]);
+                                outIndex.add(row);
+                                outIndex.add(col);
+                            }
                         }
-                    }
+                        indexCount += shortArraydata.length;
+
+                        short[] outputdata = new short[outData.size()];
+                        for (int i = 0; i < outputdata.length; i++) {
+                            outputdata[i] = outData.get(i);
+                        }
+
+                        int[] outputindex = new int[outIndex.size()];
+                        for (int i = 0; i < outputindex.length; i++) {
+                            outputindex[i] = outIndex.get(i);
+                        }
+
+                        ByteBuffer outbyteBufferdata =
+                                ByteBuffer.allocate(outputdata.length * 2);
+                        ByteBuffer outbyteBufferindex =
+                                ByteBuffer.allocate(outputindex.length * 4);
+                        if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
+                            outbyteBufferdata.order(ByteOrder.BIG_ENDIAN);
+                            outbyteBufferindex.order(ByteOrder.BIG_ENDIAN);
+                        } else {
+                            outbyteBufferdata.order(ByteOrder.LITTLE_ENDIAN);
+                            outbyteBufferindex.order(ByteOrder.LITTLE_ENDIAN);
+                        }
+                        outbyteBufferdata.clear();
+                        outbyteBufferindex.clear();
+
+                        ShortBuffer shortOutputBuffer =
+                                outbyteBufferdata.asShortBuffer();
+                        shortOutputBuffer.put(outputdata);
+
+                        IntBuffer intOutputBuffer = outbyteBufferindex.asIntBuffer();
+                        intOutputBuffer.put(outputindex);
+
+                        outIndexfile.write(outbyteBufferindex);
+                        outDatafile.write(outbyteBufferdata);
+
+                }
+                currentCount += currentChunk;
+                bufferdata.position((int)currentCount);
+                bufferweight.position((int)currentCount);
+
             }
 
-            short[] outputdata = new short[outData.size()];
-            for (int i = 0; i < outputdata.length; i++) {
-                outputdata[i] = outData.get(i);
-            }
-
-            int[] outputindex = new int[outIndex.size()];
-            for (int i = 0; i < outputindex.length; i++) {
-                outputindex[i] = outIndex.get(i);
-            }
-
-            ByteBuffer outbyteBufferdata =
-                    ByteBuffer.allocate(outputdata.length * 2);
-            ByteBuffer outbyteBufferindex =
-                    ByteBuffer.allocate(outputindex.length * 4);
-            if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
-                outbyteBufferdata.order(ByteOrder.BIG_ENDIAN);
-                outbyteBufferindex.order(ByteOrder.BIG_ENDIAN);
-            } else {
-                outbyteBufferdata.order(ByteOrder.LITTLE_ENDIAN);
-                outbyteBufferindex.order(ByteOrder.LITTLE_ENDIAN);
-            }
-            outbyteBufferdata.clear();
-            outbyteBufferindex.clear();
-
-            ShortBuffer shortOutputBuffer =
-                    outbyteBufferdata.asShortBuffer();
-            shortOutputBuffer.put(outputdata);
-
-            IntBuffer intOutputBuffer = outbyteBufferindex.asIntBuffer();
-            intOutputBuffer.put(outputindex);
-
-
-            FileChannel outIndexfile =
-                    new FileOutputStream(outFileIndex).getChannel();
-            outIndexfile.write(outbyteBufferindex);
             outIndexfile.close();
-
-
-
-            FileChannel outDatafile =
-                    new FileOutputStream(outFiledata).getChannel();
-            outDatafile.write(outbyteBufferdata);
             outDatafile.close();
 
         } catch (IOException e) {
