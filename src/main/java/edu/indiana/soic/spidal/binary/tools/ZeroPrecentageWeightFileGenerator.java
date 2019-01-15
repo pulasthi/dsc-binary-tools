@@ -41,6 +41,8 @@ public class ZeroPrecentageWeightFileGenerator {
                 for (int j = 0; j < numberOfPoints; j++) {
                     if(random.nextDouble() > zeroPrecent){
                         input[j] = (short)(weightValue*Short.MAX_VALUE);
+                    }else{
+                        input[j] = 0;
                     }
                 }
                 ShortBuffer shortOutputBuffer = byteBuffer.asShortBuffer();
