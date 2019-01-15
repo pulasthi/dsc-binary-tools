@@ -13,7 +13,7 @@ import java.util.List;
 public class SparseBinFileCreator {
     private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
     private static int dataTypeSize = Short.BYTES;
-    private static int chunkSize = 10000000;
+    private static int chunkSize = 400000;
 
     public static void main(String[] args) {
         String inputFile = args[0];
@@ -70,7 +70,7 @@ public class SparseBinFileCreator {
             int indexCount = 0;
             bufferdata = byteBufferdata.asShortBuffer();
             bufferweight = byteBufferweight.asShortBuffer();
-
+            int zeroCount = 0;
             while (currentCount < size) {
                 outData = new ArrayList();
                 outIndex = new ArrayList();
@@ -83,6 +83,7 @@ public class SparseBinFileCreator {
 
                         short[] shortArrayweight =
                                 new short[currentChunk];
+                        System.out.println("CC " + currentChunk + " shorAWLen " + shortArrayweight.length + "Buffer length " +  ((ShortBuffer) bufferweight).capacity());
                         ((ShortBuffer) bufferweight).get(shortArrayweight);
                         for (int i = 0; i < shortArraydata.length; i++) {
                             int row = (i + indexCount) / numPoints;
@@ -91,6 +92,8 @@ public class SparseBinFileCreator {
                                 outData.add(shortArraydata[i]);
                                 outIndex.add(row);
                                 outIndex.add(col);
+                            }else{
+                                zeroCount++;
                             }
                         }
                         indexCount += shortArraydata.length;
@@ -138,7 +141,7 @@ public class SparseBinFileCreator {
 
             outIndexfile.close();
             outDatafile.close();
-
+            System.out.printf("ZeroCount " + zeroCount);
         } catch (IOException e) {
             e.printStackTrace();
         }
