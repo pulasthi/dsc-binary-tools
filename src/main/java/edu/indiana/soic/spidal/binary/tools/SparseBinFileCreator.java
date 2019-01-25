@@ -38,9 +38,9 @@ public class SparseBinFileCreator {
                     (FileChannel) Files.newByteChannel(Paths.get(inputFile), StandardOpenOption.READ);
             FileChannel fcweight =
                     (FileChannel) Files.newByteChannel(Paths.get(inputFilew), StandardOpenOption.READ);
-            ByteBuffer byteBufferdata = ByteBuffer.allocate((int) fcdata.size());
+            ByteBuffer byteBufferdata = ByteBuffer.allocate(chunkSize);
             ByteBuffer byteBufferweight =
-                    ByteBuffer.allocate((int) fcweight.size());
+                    ByteBuffer.allocate(chunkSize);
 
             if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
                 byteBufferdata.order(ByteOrder.BIG_ENDIAN);
@@ -49,10 +49,7 @@ public class SparseBinFileCreator {
                 byteBufferdata.order(ByteOrder.LITTLE_ENDIAN);
                 byteBufferweight.order(ByteOrder.LITTLE_ENDIAN);
             }
-            fcdata.read(byteBufferdata);
-            fcweight.read(byteBufferweight);
-            byteBufferdata.flip();
-            byteBufferweight.flip();
+
 
             FileChannel outIndexfile =
                     new FileOutputStream(outFileIndex).getChannel();
@@ -68,13 +65,19 @@ public class SparseBinFileCreator {
             long size = fcdata.size() / 2;
             long currentCount = 0;
             int indexCount = 0;
-            bufferdata = byteBufferdata.asShortBuffer();
-            bufferweight = byteBufferweight.asShortBuffer();
+
             int zeroCount = 0;
             while (currentCount < size) {
                 outData = new ArrayList();
                 outIndex = new ArrayList();
                 int currentChunk = (size - currentCount) < chunkSize ? (int) (size - currentCount) : chunkSize;
+
+                fcdata.read(byteBufferdata);
+                fcweight.read(byteBufferweight);
+                byteBufferdata.flip();
+                byteBufferweight.flip();
+                bufferdata = byteBufferdata.asShortBuffer();
+                bufferweight = byteBufferweight.asShortBuffer();
 
                 switch (dataType) {
                     case "short":
@@ -83,16 +86,20 @@ public class SparseBinFileCreator {
 
                         short[] shortArrayweight =
                                 new short[currentChunk];
-                        System.out.println("CC " + currentChunk + " shorAWLen " + shortArrayweight.length + "Buffer length " +  ((ShortBuffer) bufferweight).capacity());
+                        System.out.println("CC " + currentChunk + " shorAWLen " + shortArrayweight.length + "Buffer length " + ((ShortBuffer) bufferweight).capacity());
                         ((ShortBuffer) bufferweight).get(shortArrayweight);
                         for (int i = 0; i < shortArraydata.length; i++) {
                             int row = (i + indexCount) / numPoints;
+                            if (row > numPoints) System.out.println("Row " +
+                                    "overlimit" + row + "size " + size +
+                                    "currentSize" + currentCount +
+                                    "currentChunk" + currentChunk);
                             int col = (i + indexCount) % numPoints;
                             if (shortArrayweight[i] > 0) {
                                 outData.add(shortArraydata[i]);
                                 outIndex.add(row);
                                 outIndex.add(col);
-                            }else{
+                            } else {
                                 zeroCount++;
                             }
                         }
@@ -136,6 +143,8 @@ public class SparseBinFileCreator {
                 currentCount += currentChunk;
                 bufferdata.position((int) currentCount);
                 bufferweight.position((int) currentCount);
+                byteBufferdata.clear();
+                byteBufferweight.clear();
                 System.out.println(" Completed " + currentCount + "/" + size);
             }
 
