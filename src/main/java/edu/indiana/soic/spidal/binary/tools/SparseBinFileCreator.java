@@ -38,9 +38,9 @@ public class SparseBinFileCreator {
                     (FileChannel) Files.newByteChannel(Paths.get(inputFile), StandardOpenOption.READ);
             FileChannel fcweight =
                     (FileChannel) Files.newByteChannel(Paths.get(inputFilew), StandardOpenOption.READ);
-            ByteBuffer byteBufferdata = ByteBuffer.allocate(chunkSize);
+            ByteBuffer byteBufferdata = ByteBuffer.allocate(chunkSize*2);
             ByteBuffer byteBufferweight =
-                    ByteBuffer.allocate(chunkSize);
+                    ByteBuffer.allocate(chunkSize*2);
 
             if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
                 byteBufferdata.order(ByteOrder.BIG_ENDIAN);
@@ -141,8 +141,8 @@ public class SparseBinFileCreator {
 
                 }
                 currentCount += currentChunk;
-                bufferdata.position((int) currentCount);
-                bufferweight.position((int) currentCount);
+//                bufferdata.position((int) currentCount);
+//                bufferweight.position((int) currentCount);
                 byteBufferdata.clear();
                 byteBufferweight.clear();
                 System.out.println(" Completed " + currentCount + "/" + size);
