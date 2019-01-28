@@ -64,7 +64,7 @@ public class SparseBinFileCreator {
             List<Integer> outIndex = new ArrayList();
             long size = fcdata.size() / 2;
             long currentCount = 0;
-            int indexCount = 0;
+            long indexCount = 0;
 
             int zeroCount = 0;
             while (currentCount < size) {
@@ -89,12 +89,12 @@ public class SparseBinFileCreator {
                         System.out.println("CC " + currentChunk + " shorAWLen " + shortArrayweight.length + "Buffer length " + ((ShortBuffer) bufferweight).capacity());
                         ((ShortBuffer) bufferweight).get(shortArrayweight);
                         for (int i = 0; i < shortArraydata.length; i++) {
-                            int row = (i + indexCount) / numPoints;
+                            int row = (int)((i + indexCount) / numPoints);
                             if (row > numPoints) System.out.println("Row " +
                                     "overlimit" + row + "size " + size +
                                     "currentSize" + currentCount +
                                     "currentChunk" + currentChunk);
-                            int col = (i + indexCount) % numPoints;
+                            int col = (int)((i + indexCount) % numPoints);
                             if (shortArrayweight[i] > 0) {
                                 outData.add(shortArraydata[i]);
                                 outIndex.add(row);
