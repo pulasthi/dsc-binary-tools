@@ -24,7 +24,7 @@ public class BloombergFileStats {
                 sum += Double.valueOf(splits[2]);
                 count++;
                 if(currntMax > row){
-                    throw new IllegalStateException("File not in order");
+                    throw new IllegalStateException("File not in order" + count);
                 }
                 if(count%10000000 == 0){
                     System.out.print(".");
