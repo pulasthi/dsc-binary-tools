@@ -26,6 +26,7 @@ public class BloombergFileStats {
                 if(currntMax > row){
                     throw new IllegalStateException("File not in order" + count);
                 }
+                currntMax = row;
                 if(count%10000000 == 0){
                     System.out.print(".");
                 }
