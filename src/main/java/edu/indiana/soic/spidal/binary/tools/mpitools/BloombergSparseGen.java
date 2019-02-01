@@ -72,13 +72,15 @@ public class BloombergSparseGen {
 
 
                     rowList.add(new Item(col, dist));
-
+                    Collections.sort(rowList);
+                    //printRowToFile(rowList);
 
                 }
 
                 //If the file ended we need to handle the last row
                 if(fileIndex < totalSplits - 1){
                     checkNextFile(rowList, currentrow, fileDir, fileIndex + 1);
+
                 }
 
 
