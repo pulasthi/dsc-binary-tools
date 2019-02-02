@@ -23,6 +23,7 @@ public class BloombergStatsMPI {
             double count = 0;
             double missingCount = 0;
             int currentMax = 0;
+            int countWrong = 0;
 
             for (int i = 0; i < filesPerProc; i++) {
                 int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
@@ -34,6 +35,10 @@ public class BloombergStatsMPI {
                 String splits[];
                 while ((line = bf.readLine()) != null) {
                     splits = line.split("\\s+");
+                    if(splits.length < 3){
+                        countWrong++;
+                        continue;
+                    }
                     int row = Integer.valueOf(splits[0]);
                     int col = Integer.valueOf(splits[1]);
                     double value = Double.valueOf(splits[2]);
@@ -58,9 +63,12 @@ public class BloombergStatsMPI {
             min = ParallelOps.allReduceMin(min);
             count = ParallelOps.allReduce(count);
             missingCount = ParallelOps.allReduce(missingCount);
+            countWrong = ParallelOps.allReduce(countWrong);
+
 
             if (ParallelOps.worldProcRank == 0) {
-                System.out.printf("Max : %.5f\nMin : %.5f\nTotalLinks : %.2f\nMissingCount : %.2f", max, min, count, missingCount);
+                System.out.printf("Max : %.5f\nMin : %.5f\nTotalLinks : %.2f\nMissingCount : %.2f\nCountWrong : %d",
+                        max, min, count, missingCount, countWrong);
             }
         } catch (MPIException e) {
             e.printStackTrace();
