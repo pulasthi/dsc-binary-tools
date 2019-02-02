@@ -9,6 +9,7 @@ import java.io.IOException;
 public class BloombergStatsMPI {
     public static void main(String[] args) {
         try {
+            System.out.println("Got Here");
             ParallelOps.setupParallelism(args);
             Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
             String fileDir = args[0];
@@ -27,7 +28,7 @@ public class BloombergStatsMPI {
                 int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
                 String fileId = (fileIndex < 100) ? "0" : "";
                 fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
-                String filePath = fileDir + fileId;
+                String filePath = fileDir + filePrefirx + fileId;
                 BufferedReader bf = new BufferedReader(new FileReader(filePath));
                 String line = null;
                 String splits[];
