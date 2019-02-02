@@ -50,6 +50,9 @@ public class BloombergStatsMPI {
                     min = (min > value) ? value : min;
 
                     count++;
+                    if(ParallelOps.worldProcRank == 0 && (count % 20000000 == 0)){
+                        System.out.print(".");
+                    }
                     if (currentMax > row) {
                         throw new IllegalStateException("File not in order" + count);
                     }
