@@ -13,7 +13,7 @@ public class BloombergStatsMPI {
             Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
             String fileDir = args[0];
 
-            int totalSplits = 48;
+            int totalSplits = 192;
             String filePrefirx = "part_";
             int filesPerProc = totalSplits / ParallelOps.worldProcsCount;
 
@@ -25,7 +25,8 @@ public class BloombergStatsMPI {
 
             for (int i = 0; i < filesPerProc; i++) {
                 int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
-                String fileId = (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
+                String fileId = (fileIndex < 100) ? "0" : "";
+                fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
                 String filePath = fileDir + fileId;
                 BufferedReader bf = new BufferedReader(new FileReader(filePath));
                 String line = null;
