@@ -35,7 +35,11 @@ public class BloombergStatsMPI {
                 String splits[];
                 while ((line = bf.readLine()) != null) {
                     splits = line.split("\\s+");
-                    if(splits.length < 3){
+                    if (splits.length < 3) {
+                        countWrong++;
+                        continue;
+                    }
+                    if (splits[0].equals("") || splits[1].equals("") || splits[2].equals("")) {
                         countWrong++;
                         continue;
                     }
