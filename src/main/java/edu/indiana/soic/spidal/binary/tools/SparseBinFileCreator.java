@@ -13,7 +13,7 @@ import java.util.List;
 public class SparseBinFileCreator {
     private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
     private static int dataTypeSize = Short.BYTES;
-    private static int chunkSize = 400000;
+    private static int chunkSize = 40000;
 
     public static void main(String[] args) {
         String inputFile = args[0];
