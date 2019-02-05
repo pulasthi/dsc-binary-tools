@@ -26,6 +26,8 @@ public class BloombergStatsMPI {
             int currentMax = -1;
             int countWrong = 0;
             int countOver1k = 0;
+            int count100to1k = 0;
+            int countover10 = 0;
 
             double sdsum = 0.0;
 
@@ -47,10 +49,16 @@ public class BloombergStatsMPI {
                     max = (value > max) ? value : max;
                     min = (min > value) ? value : min;
 
-                    if(value > 1000) countOver1k++;
+                    if (value > 1000) {
+                        countOver1k++;
+                    } else if (value > 100) {
+                        count100to1k++;
+                    } else if (value > 10) {
+                        countover10++;
+                    }
 
                     count++;
-                    if(ParallelOps.worldProcRank == 0 && (count % 20000000 == 0)){
+                    if (ParallelOps.worldProcRank == 0 && (count % 20000000 == 0)) {
                         System.out.print(".");
                     }
                     if (currentMax > row) {
@@ -70,9 +78,12 @@ public class BloombergStatsMPI {
             min = ParallelOps.allReduceMin(min);
             count = ParallelOps.allReduce(count);
             missingCount = ParallelOps.allReduce(missingCount);
+            countOver1k = ParallelOps.allReduce(countOver1k);
+            countover10 = ParallelOps.allReduce(countover10);
+            count100to1k = ParallelOps.allReduce(count100to1k);
             sum = ParallelOps.allReduce(sum);
             countWrong = ParallelOps.allReduce(countWrong);
-            double mean = sum/count;
+            double mean = sum / count;
 
             for (int i = 0; i < filesPerProc; i++) {
                 int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
@@ -85,7 +96,7 @@ public class BloombergStatsMPI {
                 while ((line = bf.readLine()) != null) {
                     splits = line.split("\\s+");
                     double value = Double.valueOf(splits[2]);
-                    sdsum += (value - mean)*(value - mean);
+                    sdsum += (value - mean) * (value - mean);
                 }
 
 
@@ -93,11 +104,11 @@ public class BloombergStatsMPI {
 
 
             sdsum = ParallelOps.allReduce(sdsum);
-            double sd = Math.sqrt(sdsum/count-1);
+            double sd = Math.sqrt(sdsum / count - 1);
             if (ParallelOps.worldProcRank == 0) {
                 System.out.printf("Max : %.5f\nMin : %.5f\nTotalLinks : %.2f\nMissingCount : %.2f\nCountWrong : %d" +
-                                "\nMean : %.5f\n Over1k %d\nSD %.5f",
-                        max, min, count, missingCount, countWrong, mean, countOver1k, sd);
+                                "\nMean : %.5f\n Over1k %d\n 100to1k %d\n 10to100 %d \nSD %.5f\n",
+                        max, min, count, missingCount, countWrong, mean, countOver1k, count100to1k, countover10, sd);
             }
         } catch (MPIException e) {
             e.printStackTrace();
