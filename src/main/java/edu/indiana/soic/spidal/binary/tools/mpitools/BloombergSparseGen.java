@@ -3,7 +3,6 @@ package edu.indiana.soic.spidal.binary.tools.mpitools;
 import mpi.MPIException;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.io.*;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -17,8 +16,8 @@ import java.util.List;
 public class BloombergSparseGen {
 
     //Min and max of all the files, this was calculated using the stats calculation
-    static double min = 1;
-    static double max = 2;
+    static double min = 0.61600;
+    static double max = 14950.00;
     private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
 
     public static void main(String[] args) {
@@ -31,7 +30,7 @@ public class BloombergSparseGen {
             endianness = args[2].equals("big") ? ByteOrder.BIG_ENDIAN :
                     ByteOrder.LITTLE_ENDIAN;
 
-            int totalSplits = 48;
+            int totalSplits = 192;
             String filePrefirx = "part_";
             int filesPerProc = totalSplits / ParallelOps.worldProcsCount;
 
@@ -47,8 +46,9 @@ public class BloombergSparseGen {
                 int currentrow = -1;
                 List<Item> rowList = new ArrayList();
                 int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
-                String fileId = (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
-                String filePath = inFileDir + fileId;
+                String fileId = (fileIndex < 100) ? "0" : "";
+                fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
+                String filePath = inFileDir + filePrefirx + fileId;
                 BufferedReader bf = new BufferedReader(new FileReader(filePath));
                 String line = null;
                 String splits[];
@@ -57,7 +57,7 @@ public class BloombergSparseGen {
                 //few rows so we can skip them
                 int pFileRow = -1;
                 if(fileIndex > 0){
-                    pFileRow = checkPreviousRow(fileIndex - 1, inFileDir);
+                    pFileRow = checkPreviousRow(fileIndex - 1, inFileDir, filePrefirx);
                 }
                 while ((line = bf.readLine()) != null) {
                     splits = line.split("\\s+");
@@ -72,7 +72,7 @@ public class BloombergSparseGen {
                     if (currentrow != row) {
                         if (currentrow != -1) {
                             Collections.sort(rowList);
-                            printRowToFile(row, rowList, outIndexfile, outDatafile);
+                            printRowToFile(currentrow, rowList, outIndexfile, outDatafile);
                             if(ParallelOps.worldProcRank == 0){
                                 if(row < 1){
                                     for (Item item : rowList) {
@@ -81,22 +81,23 @@ public class BloombergSparseGen {
                                 }
                             }
                             rowList.clear();
+                            currentrow = row;
+                            rowList.add(new Item(col, dist));
+                        }else{
+                            currentrow = row;
+                            rowList.add(new Item(col, dist));
                         }
+                    }else{
+                        rowList.add(new Item(col, dist));
                     }
-
-
-                    rowList.add(new Item(col, dist));
-                    Collections.sort(rowList);
-                    //printRowToFile(rowList);
-
                 }
 
                 //If the file ended we need to handle the last row
                 if(fileIndex < totalSplits - 1){
-                    checkNextFile(rowList, currentrow, inFileDir, fileIndex + 1);
-
+                    checkNextFile(rowList, currentrow, inFileDir, fileIndex + 1, filePrefirx);
                 }
-
+                Collections.sort(rowList);
+                printRowToFile(currentrow, rowList, outIndexfile, outDatafile);
 
             }
 
@@ -149,18 +150,20 @@ public class BloombergSparseGen {
         outDatafile.write(outbyteBufferdata);
     }
 
-    private static int checkPreviousRow(int index, String fileDir) throws IOException {
-        String fileId = (index < 10) ? "0" + index : "" + index;
-        String filePath = fileDir + fileId;
+    private static int checkPreviousRow(int index, String fileDir, String filePrefirx) throws IOException {
+        String fileId = (index < 100) ? "0" : "";
+        fileId += (index < 10) ? "0" + index : "" + index;
+        String filePath = fileDir + filePrefirx + fileId;
         BufferedReader bf = new BufferedReader(new FileReader(filePath));
         String line = bf.readLine();
         String splits[] = line.split("\\s+");;
         return Integer.valueOf(splits[0]) - 1;
     }
 
-    private static void checkNextFile(List<Item> rowList, int currentrow, String fileDir, int index) throws IOException {
-        String fileId = (index < 10) ? "0" + index : "" + index;
-        String filePath = fileDir + fileId;
+    private static void checkNextFile(List<Item> rowList, int currentrow, String fileDir, int index, String filePrefirx) throws IOException {
+        String fileId = (index < 100) ? "0" : "";
+        fileId += (index < 10) ? "0" + index : "" + index;
+        String filePath = fileDir + filePrefirx + fileId;
         BufferedReader bf = new BufferedReader(new FileReader(filePath));
         String line = null;
         String splits[];
