@@ -9,6 +9,7 @@ import java.nio.ByteOrder;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.FileChannel;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -107,6 +108,7 @@ public class BloombergSparseGen {
 
             outIndexfile.close();
             outDatafile.close();
+            System.out.printf("Done  :" + ParallelOps.worldProcRank);
         } catch (MPIException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
