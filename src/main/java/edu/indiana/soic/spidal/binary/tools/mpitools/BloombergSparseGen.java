@@ -40,7 +40,7 @@ public class BloombergSparseGen {
                     new FileOutputStream(outFileIndex).getChannel();
             FileChannel outDatafile =
                     new FileOutputStream(outFiledata).getChannel();
-
+            int count = 0;
 
             for (int i = 0; i < filesPerProc; i++) {
                 int currentrow = -1;
@@ -60,6 +60,10 @@ public class BloombergSparseGen {
                     pFileRow = checkPreviousRow(fileIndex - 1, inFileDir, filePrefirx);
                 }
                 while ((line = bf.readLine()) != null) {
+                    count++;
+                    if (ParallelOps.worldProcRank == 0 && (count % 20000000 == 0)) {
+                        System.out.print(".");
+                    }
                     splits = line.split("\\s+");
                     //Reduce 1 because the data starts from 1 not 0 as we want
                     int row = Integer.valueOf(splits[0]) - 1;
