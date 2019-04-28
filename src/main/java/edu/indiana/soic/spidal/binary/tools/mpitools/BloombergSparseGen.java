@@ -108,7 +108,10 @@ public class BloombergSparseGen {
 
             outIndexfile.close();
             outDatafile.close();
-            System.out.printf("Done  :" + ParallelOps.worldProcRank);
+            int countRanks = ParallelOps.allReduce(ParallelOps.worldProcRank);
+            if(ParallelOps.worldProcRank == 0){
+                System.out.printf("Done  : " + countRanks);
+            }
         } catch (MPIException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
