@@ -54,7 +54,7 @@ public class BloombergPartCalc {
                     outbyteBufferindex.order(endianness);
                     outbyteBufferindex.clear();
                 }
-                fcIndex.read(outbyteBufferindex, currentRead * 2);
+                fcIndex.read(outbyteBufferindex, currentRead);
                 outbyteBufferindex.flip();
 
 
@@ -86,7 +86,7 @@ public class BloombergPartCalc {
                 rows[i] = index;
             }
             rows[224] = numPoints;
-
+            System.out.println("");
             System.out.println("Stats : total count : " + count + " en Count : " + entryCount);
             System.out.println("splits : " + Arrays.toString(rows));
 
