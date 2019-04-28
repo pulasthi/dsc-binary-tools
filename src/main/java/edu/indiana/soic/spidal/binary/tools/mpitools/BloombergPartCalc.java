@@ -76,7 +76,7 @@ public class BloombergPartCalc {
                 currentRead += rbSizeIn;
             }
             int[] rows = new int[225];
-            long perProc = count / 224;
+            long perProc = entryCount / 224;
             int index = 0;
             for (int i = 1; i < rows.length; i++) {
                 long temp = 0;
