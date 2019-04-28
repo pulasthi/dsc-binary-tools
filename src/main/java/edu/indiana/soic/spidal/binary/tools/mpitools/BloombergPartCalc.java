@@ -15,7 +15,7 @@ import java.util.Arrays;
  */
 public class BloombergPartCalc {
 
-    private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
+    private static ByteOrder endianness = ByteOrder.LITTLE_ENDIAN;
     private static int numPoints = 14905940;
 
     public static void main(String[] args) {
