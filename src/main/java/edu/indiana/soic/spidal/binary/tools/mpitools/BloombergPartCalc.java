@@ -80,7 +80,7 @@ public class BloombergPartCalc {
             int index = 0;
             for (int i = 1; i < rows.length; i++) {
                 long temp = 0;
-                while (temp < perProc) {
+                while (index < numPoints && temp < perProc) {
                     temp += counts[index++];
                 }
                 rows[i] = index;
