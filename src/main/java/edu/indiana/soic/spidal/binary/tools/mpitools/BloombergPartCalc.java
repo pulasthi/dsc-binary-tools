@@ -68,14 +68,12 @@ public class BloombergPartCalc {
                         entryCount++;
                         counts[col]++;
                     }
-                    if(count % 50000000 == 0){
-                        System.out.print(".");
-                    }
                 }
 
                 currentRead += rbSizeIn;
             }
             int[] rows = new int[225];
+            long[] ranks = new long[224];
             long perProc = entryCount / 224;
             int index = 0;
             for (int i = 1; i < rows.length; i++) {
@@ -86,7 +84,16 @@ public class BloombergPartCalc {
                 rows[i] = index;
             }
             rows[224] = numPoints;
-            System.out.println("");
+
+            for (int rank = 0; rank < ranks.length; rank++) {
+                long countsPerCur = 0;
+                for (int i = rows[rank]; i < rows[rank + 1]; i++) {
+                    countsPerCur += counts[i];
+                }
+                ranks[rank] = countsPerCur;
+            }
+
+            System.out.println("allocations " + Arrays.toString(ranks));
             System.out.println("Stats : total count : " + count + " en Count : " + entryCount);
             System.out.println("splits : " + Arrays.toString(rows));
 
