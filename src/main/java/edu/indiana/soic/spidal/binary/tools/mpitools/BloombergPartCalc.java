@@ -62,6 +62,15 @@ public class BloombergPartCalc {
                     count++;
                     int row = outbyteBufferindex.getInt();
                     int col = outbyteBufferindex.getInt();
+
+                    if(row == 14510048 || col == 14510048){
+                        System.out.printf("row : %d, col : %d count %d", row, col, count);
+                    }
+
+                    if(row == 14626394 || col == 14626394){
+                        System.out.printf("row : %d, col : %d count %d", row, col, count);
+                    }
+                    
                     counts[row]++;
                     entryCount++;
                     if (row != col) {
