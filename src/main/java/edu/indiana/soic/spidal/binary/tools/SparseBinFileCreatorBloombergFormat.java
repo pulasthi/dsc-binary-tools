@@ -129,7 +129,7 @@ public class SparseBinFileCreatorBloombergFormat {
                         }
 
                         ByteBuffer outbyteBufferdata =
-                                ByteBuffer.allocate(outputdata.length * 2);
+                                ByteBuffer.allocate(outputdata.length * 4);
                         ByteBuffer outbyteBufferindex =
                                 ByteBuffer.allocate(outputindex.length * 4);
                         if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
