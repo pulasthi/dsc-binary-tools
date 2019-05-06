@@ -13,6 +13,8 @@ public class SparseBinFileCreatorBloombergFormat {
     private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
     private static int dataTypeSize = Short.BYTES;
     private static int chunkSize = 40000;
+    private static final double INV_SHORT_MAX = 1.0 / Short.MAX_VALUE;
+    private static final double INV_INT_MAX = 1.0 / Integer.MAX_VALUE;
 
     public static void main(String[] args) {
         String inputFile = args[0];
@@ -37,9 +39,9 @@ public class SparseBinFileCreatorBloombergFormat {
                     (FileChannel) Files.newByteChannel(Paths.get(inputFile), StandardOpenOption.READ);
             FileChannel fcweight =
                     (FileChannel) Files.newByteChannel(Paths.get(inputFilew), StandardOpenOption.READ);
-            ByteBuffer byteBufferdata = ByteBuffer.allocate(chunkSize*2);
+            ByteBuffer byteBufferdata = ByteBuffer.allocate(chunkSize * 2);
             ByteBuffer byteBufferweight =
-                    ByteBuffer.allocate(chunkSize*2);
+                    ByteBuffer.allocate(chunkSize * 2);
 
             if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
                 byteBufferdata.order(ByteOrder.BIG_ENDIAN);
@@ -59,7 +61,7 @@ public class SparseBinFileCreatorBloombergFormat {
             Buffer bufferdata = null;
             Buffer bufferweight = null;
 
-            List<Short> outData = new ArrayList();
+            List<Integer> outData = new ArrayList();
             List<Integer> outIndex = new ArrayList();
             long size = fcdata.size() / 2;
             long currentCount = 0;
@@ -88,17 +90,18 @@ public class SparseBinFileCreatorBloombergFormat {
                         System.out.println("CC " + currentChunk + " shorAWLen " + shortArrayweight.length + "Buffer length " + ((ShortBuffer) bufferweight).capacity());
                         ((ShortBuffer) bufferweight).get(shortArrayweight);
                         for (int i = 0; i < shortArraydata.length; i++) {
-                            int row = (int)((i + indexCount) / numPoints);
+                            int row = (int) ((i + indexCount) / numPoints);
                             if (row > numPoints) System.out.println("Row " +
                                     "overlimit" + row + "size " + size +
                                     "currentSize" + currentCount +
                                     "currentChunk" + currentChunk);
-                            int col = (int)((i + indexCount) % numPoints);
+                            int col = (int) ((i + indexCount) % numPoints);
                             if (shortArrayweight[i] > 0) {
-                                if(seenMap.containsKey(col) && seenMap.get(col).contains(row)){
+                                if (seenMap.containsKey(col) && seenMap.get(col).contains(row)) {
                                     //Going to skip since already added
-                                }else {
-                                    outData.add(shortArraydata[i]);
+                                } else {
+                                    int tempint = (int) ((shortArraydata[i] * INV_SHORT_MAX) * Integer.MAX_VALUE);
+                                    outData.add(tempint);
                                     outIndex.add(row);
                                     outIndex.add(col);
                                     if (seenMap.containsKey(row)) {
@@ -115,7 +118,7 @@ public class SparseBinFileCreatorBloombergFormat {
                         }
                         indexCount += shortArraydata.length;
 
-                        short[] outputdata = new short[outData.size()];
+                        int[] outputdata = new int[outData.size()];
                         for (int i = 0; i < outputdata.length; i++) {
                             outputdata[i] = outData.get(i);
                         }
@@ -139,8 +142,8 @@ public class SparseBinFileCreatorBloombergFormat {
                         outbyteBufferdata.clear();
                         outbyteBufferindex.clear();
 
-                        ShortBuffer shortOutputBuffer =
-                                outbyteBufferdata.asShortBuffer();
+                        IntBuffer shortOutputBuffer =
+                                outbyteBufferdata.asIntBuffer();
                         shortOutputBuffer.put(outputdata);
 
                         IntBuffer intOutputBuffer = outbyteBufferindex.asIntBuffer();
