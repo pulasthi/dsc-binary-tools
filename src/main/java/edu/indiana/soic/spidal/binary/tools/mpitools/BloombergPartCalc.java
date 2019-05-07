@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class BloombergPartCalc {
 
     private static ByteOrder endianness = ByteOrder.LITTLE_ENDIAN;
-    private static int numPoints = 14905940;
+    private static int numPoints = 29953;
 
     public static void main(String[] args) {
         Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
@@ -62,15 +62,7 @@ public class BloombergPartCalc {
                     count++;
                     int row = outbyteBufferindex.getInt();
                     int col = outbyteBufferindex.getInt();
-
-                    if(row == 14510048 || col == 14510048){
-                        System.out.printf("row : %d, col : %d count %d", row, col, count);
-                    }
-
-                    if(row == 14626394 || col == 14626394){
-                        System.out.printf("row : %d, col : %d count %d", row, col, count);
-                    }
-
+                    
                     counts[row]++;
                     entryCount++;
                     if (row != col) {
