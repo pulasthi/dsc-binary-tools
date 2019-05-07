@@ -24,7 +24,7 @@ public class BloombergPartCalc {
         int[] counts = new int[numPoints];
         long count = 0;
         long entryCount = 0;
-        long blockSize = 1024 * 1024 * 1000; // 200Mb, the index file will take 200*4
+        long blockSize = 1024 * 1024 * 200; // 200Mb, the index file will take 200*4
 
         try {
 
@@ -70,7 +70,7 @@ public class BloombergPartCalc {
                     if(row == 14626394 || col == 14626394){
                         System.out.printf("row : %d, col : %d count %d", row, col, count);
                     }
-                    
+
                     counts[row]++;
                     entryCount++;
                     if (row != col) {
@@ -81,9 +81,9 @@ public class BloombergPartCalc {
 
                 currentRead += rbSizeIn;
             }
-            int[] rows = new int[225];
-            long[] ranks = new long[224];
-            long perProc = entryCount / 224;
+            int[] rows = new int[17];
+            long[] ranks = new long[16];
+            long perProc = entryCount / 16;
             int index = 0;
             for (int i = 1; i < rows.length; i++) {
                 long temp = 0;
