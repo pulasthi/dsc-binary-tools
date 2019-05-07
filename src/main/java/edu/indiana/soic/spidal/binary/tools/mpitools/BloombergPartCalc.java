@@ -62,7 +62,7 @@ public class BloombergPartCalc {
                     count++;
                     int row = outbyteBufferindex.getInt();
                     int col = outbyteBufferindex.getInt();
-                    
+
                     counts[row]++;
                     entryCount++;
                     if (row != col) {
@@ -84,7 +84,7 @@ public class BloombergPartCalc {
                 }
                 rows[i] = index;
             }
-            rows[224] = numPoints;
+            rows[16] = numPoints;
 
             for (int rank = 0; rank < ranks.length; rank++) {
                 long countsPerCur = 0;
