@@ -103,7 +103,9 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
                 if (i == j) {
                     input[countin++] = 0;
                     zeros++;
-                } else if (val > maxVal) {
+                } else if(i == 0 || j == 0){
+                    input[countin++] = (short) (weightValue * Short.MAX_VALUE);
+                }else if (val > maxVal) {
                     input[countin++] = 0;
                     zeros++;
                 } else {
