@@ -54,7 +54,7 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
             }
 
             int total = numberOfPoints * numberOfPoints;
-            int percent = (int) (total * 0.1);
+            int percent = (int) (total * (1.0 - zeroPrecent));
 
             int tempcount = 0;
             for (int curr : counts) {
