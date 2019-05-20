@@ -106,7 +106,7 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
 
                 }
             }
-            System.out.println("Zero p%% " + zeros/(numberOfPoints*numberOfPoints));
+            System.out.println("Zeros : " + zeros + " Zero p%% " + (double)zeros/(numberOfPoints*numberOfPoints));
             ShortBuffer shortOutputBuffer = byteBuffer.asShortBuffer();
             shortOutputBuffer.put(input);
             out.write(byteBuffer);
