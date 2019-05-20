@@ -103,14 +103,25 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
                 if (i == j) {
                     input[countin++] = 0;
                     zeros++;
-                } else if(i == 0 || j == 0){
-                    input[countin++] = (short) (weightValue * Short.MAX_VALUE);
-                }else if (val > maxVal) {
+                } else if (val > maxVal) {
                     input[countin++] = 0;
                     zeros++;
                 } else {
                     input[countin++] = (short) (weightValue * Short.MAX_VALUE);
 
+                }
+            }
+
+
+            for (int i = 0; i < numberOfPoints; i++) {
+                double tempsum = 0;
+                for (int j = 0; j < numberOfPoints; j++) {
+                    tempsum += input[i*numberOfPoints+j];
+                }
+                if(tempsum == 0){
+                    System.out.println("zero row");
+                    input[i] = (short) (weightValue * Short.MAX_VALUE);
+                    input[i*numberOfPoints] = (short) (weightValue * Short.MAX_VALUE);
                 }
             }
             System.out.println("Zeros : " + zeros + " Zero p%% " + (double) zeros / (numberOfPoints * numberOfPoints));
