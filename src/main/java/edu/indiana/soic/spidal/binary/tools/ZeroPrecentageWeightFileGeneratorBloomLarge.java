@@ -23,10 +23,10 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
     public static void main(String[] args) {
         String outFile = args[0];
         String inFile = args[1];
-        int numberOfPoints = Integer.parseInt(args[1]);
-        double weightValue = Double.parseDouble(args[2]);
-        double zeroPrecent = Double.parseDouble(args[3]);
-        endianness = args[4].equals("big") ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
+        int numberOfPoints = Integer.parseInt(args[2]);
+        double weightValue = Double.parseDouble(args[3]);
+        double zeroPrecent = Double.parseDouble(args[4]);
+        endianness = args[5].equals("big") ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
 
         int counts[] = new int[Short.MAX_VALUE];
         Buffer bufferdata = null;
