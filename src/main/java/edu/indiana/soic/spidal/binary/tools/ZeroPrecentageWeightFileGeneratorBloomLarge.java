@@ -98,7 +98,12 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
             byteBuffer.clear();
             int countin = 0;
             for (short val : shortArraydata) {
-                if (val > maxVal) {
+                int i = countin / numberOfPoints;
+                int j = countin % numberOfPoints;
+                if (i == j) {
+                    input[countin++] = 0;
+                    zeros++;
+                } else if (val > maxVal) {
                     input[countin++] = 0;
                     zeros++;
                 } else {
@@ -106,7 +111,7 @@ public class ZeroPrecentageWeightFileGeneratorBloomLarge {
 
                 }
             }
-            System.out.println("Zeros : " + zeros + " Zero p%% " + (double)zeros/(numberOfPoints*numberOfPoints));
+            System.out.println("Zeros : " + zeros + " Zero p%% " + (double) zeros / (numberOfPoints * numberOfPoints));
             ShortBuffer shortOutputBuffer = byteBuffer.asShortBuffer();
             shortOutputBuffer.put(input);
             out.write(byteBuffer);
