@@ -10,7 +10,6 @@ import java.io.IOException;
 public class BloombergHeatMap {
     public static void main(String[] args) {
         try {
-            System.out.println("Got Here");
             ParallelOps.setupParallelism(args);
             Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
             int para = ParallelOps.worldProcsCount;
@@ -56,13 +55,16 @@ public class BloombergHeatMap {
                     localMin = (dist < localMin) ? dist : localMin;
                     localMax = (dist > localMax) ? dist : localMax;
                 }
+                if(i%100 == 0){
+                    Utils.printMessage(".");
+                }
             }
 
             double max = ParallelOps.allReduceMax(localMax);
             double min = ParallelOps.allReduceMin(localMin);
             System.out.println("Min" + min);
             System.out.println("Max" + max);
-            
+
         }catch (MPIException e){
             e.printStackTrace();
         }
