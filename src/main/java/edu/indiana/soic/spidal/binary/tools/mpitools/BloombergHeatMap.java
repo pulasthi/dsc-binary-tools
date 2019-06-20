@@ -18,6 +18,7 @@ public class BloombergHeatMap {
             double localMax = Double.MIN_VALUE;
             double[][] points = new double[numPoints][3];
             int pointsPerProc = numPoints/para;
+            ParallelOps.worldProcsComm.barrier();
 
             Utils.printMessage("Done allReduceMax");
             localMax = ParallelOps.allReduceMax(localMax);
@@ -46,6 +47,8 @@ public class BloombergHeatMap {
                 e.printStackTrace();
             }
 
+            ParallelOps.worldProcsComm.barrier();
+            Utils.printMessage("All done reading");
             //do local points and get local min , max
             int start = ParallelOps.worldProcRank*pointsPerProc;
             int end = pointsPerProc * (ParallelOps.worldProcRank + 1);
@@ -64,6 +67,7 @@ public class BloombergHeatMap {
                 }
             }
 
+            ParallelOps.worldProcsComm.barrier();
             Utils.printMessage("Done calculations");
             localMax = ParallelOps.allReduceMax(localMax);
             System.out.println("Max" + localMax);
