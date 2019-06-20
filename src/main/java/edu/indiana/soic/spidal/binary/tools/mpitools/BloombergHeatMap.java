@@ -19,6 +19,10 @@ public class BloombergHeatMap {
             double[][] points = new double[numPoints][3];
             int pointsPerProc = numPoints/para;
 
+            Utils.printMessage("Done allReduceMax");
+            localMax = ParallelOps.allReduceMax(localMax);
+            Utils.printMessage("Done allReduceMax");
+
             double heatmap[] = new double[1000*1000];
             try {
                 //read points
@@ -61,11 +65,10 @@ public class BloombergHeatMap {
             }
 
             Utils.printMessage("Done calculations");
-            double max = ParallelOps.allReduceMax(localMax);
-            System.out.println("Max" + max);
-            double min = ParallelOps.allReduceMin(localMin);
-            System.out.println("Min" + min);
-
+            localMax = ParallelOps.allReduceMax(localMax);
+            System.out.println("Max" + localMax);
+            localMin = ParallelOps.allReduceMin(localMin);
+            System.out.println("Min" + localMin);
 
 //            int totalSplits = 192;
 //            String filePrefirx = "part_";
@@ -108,6 +111,7 @@ public class BloombergHeatMap {
 //
 //            outWriter.flush();
 //            outWriter.close();
+            ParallelOps.tearDownParallelism();
 
         }catch (MPIException e ){
             e.printStackTrace();
