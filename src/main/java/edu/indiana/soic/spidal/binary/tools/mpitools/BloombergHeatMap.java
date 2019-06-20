@@ -53,22 +53,23 @@ public class BloombergHeatMap {
             }
 
             for (int i = start; i < end; i++) {
-                for (double[] point : points) {
-                    double dist = euclideanDist(points[i], point);
-                    localMin = (dist < localMin) ? dist : localMin;
-                    localMax = (dist > localMax) ? dist : localMax;
-                }
-                if(i%100 == 0){
-                    Utils.printMessage(".");
-                }
+//                for (double[] point : points) {
+//                    double dist = euclideanDist(points[i], point);
+//                    localMin = (dist < localMin) ? dist : localMin;
+//                    localMax = (dist > localMax) ? dist : localMax;
+//                }
+//                if(i%100 == 0){
+//                    Utils.printMessage(".");
+//                }
             }
 
+            Utils.printMessage("Done calculations on 0");
             ParallelOps.worldProcsComm.barrier();
             Utils.printMessage("Done calculations");
             localMax = ParallelOps.allReduceMax(localMax);
-            System.out.println("Max" + localMax);
+            Utils.printMessage("Max" + localMax);
             localMin = ParallelOps.allReduceMin(localMin);
-            System.out.println("Min" + localMin);
+            Utils.printMessage("Min" + localMin);
 
 //            int totalSplits = 192;
 //            String filePrefirx = "part_";
