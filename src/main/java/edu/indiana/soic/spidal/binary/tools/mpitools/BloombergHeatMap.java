@@ -20,10 +20,6 @@ public class BloombergHeatMap {
             int pointsPerProc = numPoints/para;
             ParallelOps.worldProcsComm.barrier();
 
-            Utils.printMessage("Done allReduceMax");
-            localMax = ParallelOps.allReduceMax(localMax);
-            Utils.printMessage("Done allReduceMax");
-
             double heatmap[] = new double[1000*1000];
             try {
                 //read points
@@ -57,11 +53,11 @@ public class BloombergHeatMap {
             }
 
             for (int i = start; i < end; i++) {
-//                for (double[] point : points) {
-//                    double dist = euclideanDist(points[i], point);
-//                    localMin = (dist < localMin) ? dist : localMin;
-//                    localMax = (dist > localMax) ? dist : localMax;
-//                }
+                for (double[] point : points) {
+                    double dist = euclideanDist(points[i], point);
+                    localMin = (dist < localMin) ? dist : localMin;
+                    localMax = (dist > localMax) ? dist : localMax;
+                }
                 if(i%100 == 0){
                     Utils.printMessage(".");
                 }
