@@ -63,7 +63,7 @@ public class BloombergHeatMap {
 //                }
             }
 
-            Utils.printMessage("Done calculations on 0");
+            System.out.println("Done calculations on " + ParallelOps.worldProcRank);
             ParallelOps.worldProcsComm.barrier();
             Utils.printMessage("Done calculations");
             localMax = ParallelOps.allReduceMax(localMax);
