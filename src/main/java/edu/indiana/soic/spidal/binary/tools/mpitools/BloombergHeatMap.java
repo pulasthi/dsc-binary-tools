@@ -55,7 +55,7 @@ public class BloombergHeatMap {
             System.out.println("Rank " + ParallelOps.worldProcRank + " S : " + start + " E : " + end);
             int count = 0;
             for (int i = start; i < end; i++) {
-                count++:
+                count++;
 //                for (double[] point : points) {
 //                    double dist = euclideanDist(points[i], point);
 //                    localMin = (dist < localMin) ? dist : localMin;
