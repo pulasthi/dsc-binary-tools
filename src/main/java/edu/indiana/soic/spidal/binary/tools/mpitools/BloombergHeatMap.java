@@ -53,18 +53,17 @@ public class BloombergHeatMap {
             }
 
             System.out.println("Rank " + ParallelOps.worldProcRank + " S : " + start + " E : " + end);
+            int count = 0;
             for (int i = start; i < end; i++) {
+                count++:
 //                for (double[] point : points) {
 //                    double dist = euclideanDist(points[i], point);
 //                    localMin = (dist < localMin) ? dist : localMin;
 //                    localMax = (dist > localMax) ? dist : localMax;
 //                }
-//                if(i%100 == 0){
-//                    Utils.printMessage(".");
-//                }
             }
 
-            System.out.println("Done calculations on " + ParallelOps.worldProcRank);
+            System.out.println("Done calculations on " + ParallelOps.worldProcRank + " C : " + count);
             ParallelOps.worldProcsComm.barrier();
             Utils.printMessage("Done calculations");
             localMax = ParallelOps.allReduceMax(localMax);
