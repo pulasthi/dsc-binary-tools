@@ -52,69 +52,75 @@ public class BloombergHeatMap {
                 end = numPoints;
             }
 
-            System.out.println("Rank " + ParallelOps.worldProcRank + " S : " + start + " E : " + end);
-            int count = 0;
-            for (int i = start; i < end; i++) {
-                count++;
-//                for (double[] point : points) {
-//                    double dist = euclideanDist(points[i], point);
-//                    localMin = (dist < localMin) ? dist : localMin;
-//                    localMax = (dist > localMax) ? dist : localMax;
-//                }
+//            System.out.println("Rank " + ParallelOps.worldProcRank + " S : " + start + " E : " + end);
+//            int count = 0;
+//            for (int i = start; i < end; i++) {
+//                count++;
+////                for (double[] point : points) {
+////                    double dist = euclideanDist(points[i], point);
+////                    localMin = (dist < localMin) ? dist : localMin;
+////                    localMax = (dist > localMax) ? dist : localMax;
+////                }
+//            }
+
+            double max = 2.5511707999080118;
+            double min = 0.0;
+
+//            ParallelOps.worldProcsComm.barrier();
+//            Utils.printMessage("Done calculations");
+//            localMax = ParallelOps.allReduceMax(localMax);
+//            Utils.printMessage("Max" + localMax);
+//            localMin = ParallelOps.allReduceMin(localMin);
+//            Utils.printMessage("Min" + localMin);
+
+            int totalSplits = 192;
+            String filePrefirx = "part_";
+            int filesPerProc = totalSplits / ParallelOps.worldProcsCount;
+
+            for (int i = 0; i < filesPerProc; i++) {
+                int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
+                String fileId = (fileIndex < 100) ? "0" : "";
+                fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
+                String filePath = fileDir + filePrefirx + fileId;
+                BufferedReader bf = new BufferedReader(new FileReader(filePath));
+                String line = null;
+                String splits[];
+                while ((line = bf.readLine()) != null) {
+                    splits = line.split("\\s+");
+
+                    int row = Integer.valueOf(splits[0]);
+                    int col = Integer.valueOf(splits[1]);
+                    double valueOri = Double.valueOf(splits[2]);
+                    double temp = euclideanDist(points[row], points[col]);
+                    double valueMDS = (temp - min) / (max - min);
+
+                    //convert to indexes
+                    int mdsindex_i = (int)Math.floor(valueMDS*1000);
+                    int orindex_j = (int)Math.floor(valueOri*1000);
+
+                    heatmap[mdsindex_i*1000 + orindex_j] += 1;
+                }
             }
 
-            System.out.println("Done calculations on " + ParallelOps.worldProcRank + " C : " + count);
-            ParallelOps.worldProcsComm.barrier();
-            Utils.printMessage("Done calculations");
-            localMax = ParallelOps.allReduceMax(localMax);
-            Utils.printMessage("Max" + localMax);
-            localMin = ParallelOps.allReduceMin(localMin);
-            Utils.printMessage("Min" + localMin);
+            PrintWriter outWriter = new PrintWriter(new FileWriter(outFile));
 
-//            int totalSplits = 192;
-//            String filePrefirx = "part_";
-//            int filesPerProc = totalSplits / ParallelOps.worldProcsCount;
-//
-//            for (int i = 0; i < filesPerProc; i++) {
-//                int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
-//                String fileId = (fileIndex < 100) ? "0" : "";
-//                fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
-//                String filePath = fileDir + filePrefirx + fileId;
-//                BufferedReader bf = new BufferedReader(new FileReader(filePath));
-//                String line = null;
-//                String splits[];
-//                while ((line = bf.readLine()) != null) {
-//                    splits = line.split("\\s+");
-//
-//                    int row = Integer.valueOf(splits[0]);
-//                    int col = Integer.valueOf(splits[1]);
-//                    double valueOri = Double.valueOf(splits[2]);
-//                    double temp = euclideanDist(points[row], points[col]);
-//                    double valueMDS = (temp - min) / (max - min);
-//
-//                    //convert to indexes
-//                    int mdsindex_i = (int)Math.floor(valueMDS*1000);
-//                    int orindex_j = (int)Math.floor(valueOri*1000);
-//
-//                    heatmap[mdsindex_i*1000 + orindex_j] += 1;
-//                }
-//            }
-//
-//            PrintWriter outWriter = new PrintWriter(new FileWriter(outFile));
-//
-//            for (int i = 0; i < 1000; i++) {
-//                for (int j = 0; j < 1000; j++) {
-//                    double v = heatmap[i*1000 + j];
-//                    outWriter.print(v + ",");
-//                }
-//                outWriter.print("\n");
-//            }
-//
-//            outWriter.flush();
-//            outWriter.close();
+            for (int i = 0; i < 1000; i++) {
+                for (int j = 0; j < 1000; j++) {
+                    double v = heatmap[i*1000 + j];
+                    outWriter.print(v + ",");
+                }
+                outWriter.print("\n");
+            }
+
+            outWriter.flush();
+            outWriter.close();
             ParallelOps.tearDownParallelism();
 
         }catch (MPIException e ){
+            e.printStackTrace();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
