@@ -76,7 +76,8 @@ public class BloombergHeatMap {
 
             double max = 2.5511707999080118;
             double min = 0.0;
-
+            double minOri = 0.61600;
+            double maxOri = 14950.00;
 //            ParallelOps.worldProcsComm.barrier();
 //            Utils.printMessage("Done calculations");
 //            localMax = ParallelOps.allReduceMax(localMax);
@@ -101,7 +102,9 @@ public class BloombergHeatMap {
 
                     int row = indexMap.get(Integer.valueOf(splits[0]));
                     int col = indexMap.get(Integer.valueOf(splits[1]));
-                    double valueOri = Double.valueOf(splits[2]);
+                    double score = Double.valueOf(splits[2]);
+                    double valueOri = (1 / score - 1 / maxOri) * minOri * maxOri / (maxOri - minOri);
+
                     double temp = euclideanDist(points[row], points[col]);
                     double valueMDS = (temp - min) / (max - min);
                     if(valueMDS > 1.0){
