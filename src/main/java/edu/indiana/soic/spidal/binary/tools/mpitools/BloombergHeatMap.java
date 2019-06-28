@@ -104,7 +104,13 @@ public class BloombergHeatMap {
                     double valueOri = Double.valueOf(splits[2]);
                     double temp = euclideanDist(points[row], points[col]);
                     double valueMDS = (temp - min) / (max - min);
+                    if(valueMDS > 1.0){
+                        System.out.println("Error valueMDS " + valueMDS);
+                    }
 
+                    if(valueOri > 1.0){
+                        System.out.println("Error valueOri " + valueOri);
+                    }
                     //convert to indexes
                     int mdsindex_i = (int)Math.floor(valueMDS*1000);
                     int orindex_j = (int)Math.floor(valueOri*1000);
