@@ -3,6 +3,8 @@ package edu.indiana.soic.spidal.binary.tools.mpitools;
 import mpi.MPIException;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public class BloombergHeatMap {
     public static void main(String[] args) {
@@ -14,9 +16,11 @@ public class BloombergHeatMap {
             String mdspoints = args[1];
             String fileDir = args[2];
             String outFile = args[3];
+            String indexFile = args[4];
             double localMin = Double.MAX_VALUE;
             double localMax = Double.MIN_VALUE;
             double[][] points = new double[numPoints][3];
+            Map<Integer, Integer> indexMap = new HashMap<Integer, Integer>();
             int pointsPerProc = numPoints/para;
             ParallelOps.worldProcsComm.barrier();
 
@@ -38,6 +42,13 @@ public class BloombergHeatMap {
                     index++;
                 }
 
+
+                //read index mapping
+                BufferedReader bfin = new BufferedReader(new FileReader(indexFile));
+                while ((line = bfin.readLine()) != null){
+                    splits = line.split("\\s+");
+                    indexMap.put(Integer.valueOf(splits[0]), Integer.valueOf(splits[1]));
+                }
 
             }catch (IOException e){
                 e.printStackTrace();
@@ -88,8 +99,8 @@ public class BloombergHeatMap {
                 while ((line = bf.readLine()) != null) {
                     splits = line.split("\\s+");
 
-                    int row = Integer.valueOf(splits[0]);
-                    int col = Integer.valueOf(splits[1]);
+                    int row = indexMap.get(Integer.valueOf(splits[0]));
+                    int col = indexMap.get(Integer.valueOf(splits[1]));
                     double valueOri = Double.valueOf(splits[2]);
                     double temp = euclideanDist(points[row], points[col]);
                     double valueMDS = (temp - min) / (max - min);
