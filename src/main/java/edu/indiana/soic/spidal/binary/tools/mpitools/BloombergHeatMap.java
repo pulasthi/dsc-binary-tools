@@ -121,6 +121,10 @@ public class BloombergHeatMap {
                     //convert to indexes
                     int mdsindex_i = (int)Math.floor(valueMDS*1000);
                     int orindex_j = (int)Math.floor(valueOri*1000);
+
+                    if(mdsindex_i == 1000) mdsindex_i -= 1;
+                    if(orindex_j == 1000) orindex_j -= 1;
+                    
                     histtroOri[orindex_j]++;
                     histtroMDS[mdsindex_i]++;
                     heatmap[mdsindex_i*1000 + orindex_j] += 1;
