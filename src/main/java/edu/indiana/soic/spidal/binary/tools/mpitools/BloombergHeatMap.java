@@ -136,32 +136,37 @@ public class BloombergHeatMap {
             ParallelOps.allReduce(histtroMDS, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(histtroOri, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(heatmap, MPI.SUM, ParallelOps.worldProcsComm);
-            PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir + "/" + "heatmap.txt"));
-            PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir + "/" + "histoMDS.txt"));
-            PrintWriter outWriterhistOir = new PrintWriter(new FileWriter(outFileDir + "/" + "histoOri.txt"));
 
-            for (double val : histtroMDS) {
-                outWriterhistMds.print(val+",");
-            }
+            if (ParallelOps.worldProcRank == 0) {
 
-            for (double val : histtroOri) {
-                outWriterhistOir.print(val+",");
-            }
+                PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir + "/" + "heatmap.txt"));
+                PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir + "/" + "histoMDS.txt"));
+                PrintWriter outWriterhistOir = new PrintWriter(new FileWriter(outFileDir + "/" + "histoOri.txt"));
 
-            for (int i = 0; i < 1000; i++) {
-                for (int j = 0; j < 1000; j++) {
-                    double v = heatmap[i*1000 + j];
-                    outWriter.print(v + ",");
+                for (double val : histtroMDS) {
+                    outWriterhistMds.print(val+",");
                 }
-                outWriter.print("\n");
+
+                for (double val : histtroOri) {
+                    outWriterhistOir.print(val+",");
+                }
+
+                for (int i = 0; i < 1000; i++) {
+                    for (int j = 0; j < 1000; j++) {
+                        double v = heatmap[i*1000 + j];
+                        outWriter.print(v + ",");
+                    }
+                    outWriter.print("\n");
+                }
+
+                outWriter.flush();
+                outWriter.close();
+                outWriterhistMds.flush();
+                outWriterhistMds.close();
+                outWriterhistOir.flush();
+                outWriterhistOir.close();
             }
 
-            outWriter.flush();
-            outWriter.close();
-            outWriterhistMds.flush();
-            outWriterhistMds.close();
-            outWriterhistOir.flush();
-            outWriterhistOir.close();
             ParallelOps.tearDownParallelism();
 
         }catch (MPIException e ){
