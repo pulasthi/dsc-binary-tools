@@ -59,7 +59,7 @@ public class BloombergStatsMPI {
                     } else if (value >= 10) {
                         countover10++;
                         histogram[1010]++;
-                    }if(value < 10 && value >= 1){
+                    }else if(value < 10 && value >= 1){
                         int ind = (int)(Math.floor(value));
                         histogram[1000+ind]++;
                     }else{
