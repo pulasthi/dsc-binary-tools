@@ -63,7 +63,7 @@ public class BloombergStatsMPI {
                         int ind = (int)(Math.floor(value));
                         histogram[1000+ind]++;
                     }else{
-                        int ind = (int)(Math.floor(value));
+                        int ind = (int)(Math.floor(value*1000));
                         histogram[ind]++;
                     }
 
