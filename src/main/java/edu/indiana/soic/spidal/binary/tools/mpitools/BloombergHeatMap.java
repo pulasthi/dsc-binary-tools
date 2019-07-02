@@ -101,6 +101,7 @@ public class BloombergHeatMap {
                 BufferedReader bf = new BufferedReader(new FileReader(filePath));
                 String line = null;
                 String splits[];
+                System.out.println("Rank " + ParallelOps.worldProcRank + " File name " + filePath);
                 while ((line = bf.readLine()) != null) {
                     splits = line.split("\\s+");
 
@@ -124,7 +125,7 @@ public class BloombergHeatMap {
 
                     if(mdsindex_i == 1000) mdsindex_i -= 1;
                     if(orindex_j == 1000) orindex_j -= 1;
-                    
+
                     histtroOri[orindex_j]++;
                     histtroMDS[mdsindex_i]++;
                     heatmap[mdsindex_i*1000 + orindex_j] += 1;
