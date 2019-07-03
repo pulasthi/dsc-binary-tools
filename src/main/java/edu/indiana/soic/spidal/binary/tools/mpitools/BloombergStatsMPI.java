@@ -13,7 +13,7 @@ public class BloombergStatsMPI {
             Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
             String fileDir = args[0];
             String outFile = args[1];
-            String outFile2 = args[1];
+            String outFile2 = args[2];
 
             int totalSplits = 192;
             String filePrefirx = "part_";
@@ -100,6 +100,7 @@ public class BloombergStatsMPI {
             countover10 = ParallelOps.allReduce(countover10);
             count100to1k = ParallelOps.allReduce(count100to1k);
             ParallelOps.allReduce(histogram, MPI.SUM, ParallelOps.worldProcsComm);
+            ParallelOps.allReduce(histogram60, MPI.SUM, ParallelOps.worldProcsComm);
             sum = ParallelOps.allReduce(sum);
             countWrong = ParallelOps.allReduce(countWrong);
             double mean = sum / count;
