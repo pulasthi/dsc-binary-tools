@@ -13,6 +13,7 @@ public class BloombergStatsMPI {
             Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
             String fileDir = args[0];
             String outFile = args[1];
+            String outFile2 = args[1];
 
             int totalSplits = 192;
             String filePrefirx = "part_";
@@ -29,6 +30,7 @@ public class BloombergStatsMPI {
             int count100to1k = 0;
             int countover10 = 0;
             double[] histogram = new double[1013];
+            double[] histogram60 = new double[60];
 
             double sdsum = 0.0;
 
@@ -50,6 +52,13 @@ public class BloombergStatsMPI {
                     max = (value > max) ? value : max;
                     min = (min > value) ? value : min;
 
+
+                    //Histo 60 graph
+                    int index60 = (int)Math.floor(value/250);
+                    histogram60[index60]++;
+
+
+                    //Histo my
                     if (value > 1000) {
                         countOver1k++;
                         histogram[1012]++;
@@ -103,6 +112,16 @@ public class BloombergStatsMPI {
                 }
                 outWriterhistMds.flush();
                 outWriterhistMds.close();
+
+
+                //60
+                PrintWriter outWriterhist60 = new PrintWriter(new FileWriter(outFile2));
+                for (double val : histogram60) {
+                    outWriterhist60.print(val+",");
+                }
+
+                outWriterhist60.flush();
+                outWriterhist60.close();
             }
 
 //            for (int i = 0; i < filesPerProc; i++) {
