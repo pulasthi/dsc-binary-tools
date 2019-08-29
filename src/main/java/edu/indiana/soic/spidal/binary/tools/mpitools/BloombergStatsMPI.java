@@ -1,10 +1,9 @@
 package edu.indiana.soic.spidal.binary.tools.mpitools;
 
+import mpi.MPI;
 import mpi.MPIException;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 
 public class BloombergStatsMPI {
     public static void main(String[] args) {
@@ -13,6 +12,8 @@ public class BloombergStatsMPI {
             ParallelOps.setupParallelism(args);
             Utils.printMessage("Starting with " + ParallelOps.worldProcsCount + "Processes");
             String fileDir = args[0];
+            String outFile = args[1];
+            String outFile2 = args[2];
 
             int totalSplits = 192;
             String filePrefirx = "part_";
@@ -28,6 +29,8 @@ public class BloombergStatsMPI {
             int countOver1k = 0;
             int count100to1k = 0;
             int countover10 = 0;
+            double[] histogram = new double[1013];
+            double[] histogram60 = new double[60];
 
             double sdsum = 0.0;
 
@@ -49,12 +52,28 @@ public class BloombergStatsMPI {
                     max = (value > max) ? value : max;
                     min = (min > value) ? value : min;
 
+
+                    //Histo 60 graph
+                    int index60 = (int)Math.floor(value/250);
+                    histogram60[index60]++;
+
+
+                    //Histo my
                     if (value > 1000) {
                         countOver1k++;
+                        histogram[1012]++;
                     } else if (value > 100) {
                         count100to1k++;
-                    } else if (value > 10) {
+                        histogram[1011]++;
+                    } else if (value >= 10) {
                         countover10++;
+                        histogram[1010]++;
+                    }else if(value < 10 && value >= 1){
+                        int ind = (int)(Math.floor(value));
+                        histogram[1000+ind]++;
+                    }else{
+                        int ind = (int)(Math.floor(value*1000));
+                        histogram[ind]++;
                     }
 
                     count++;
@@ -73,7 +92,6 @@ public class BloombergStatsMPI {
 
 
             }
-            System.out.println();
             max = ParallelOps.allReduceMax(max);
             min = ParallelOps.allReduceMin(min);
             count = ParallelOps.allReduce(count);
@@ -81,26 +99,48 @@ public class BloombergStatsMPI {
             countOver1k = ParallelOps.allReduce(countOver1k);
             countover10 = ParallelOps.allReduce(countover10);
             count100to1k = ParallelOps.allReduce(count100to1k);
+            ParallelOps.allReduce(histogram, MPI.SUM, ParallelOps.worldProcsComm);
+            ParallelOps.allReduce(histogram60, MPI.SUM, ParallelOps.worldProcsComm);
             sum = ParallelOps.allReduce(sum);
             countWrong = ParallelOps.allReduce(countWrong);
             double mean = sum / count;
 
-            for (int i = 0; i < filesPerProc; i++) {
-                int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
-                String fileId = (fileIndex < 100) ? "0" : "";
-                fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
-                String filePath = fileDir + filePrefirx + fileId;
-                BufferedReader bf = new BufferedReader(new FileReader(filePath));
-                String line = null;
-                String splits[];
-                while ((line = bf.readLine()) != null) {
-                    splits = line.split("\\s+");
-                    double value = Double.valueOf(splits[2]);
-                    sdsum += (value - mean) * (value - mean);
+
+            if(ParallelOps.worldProcRank==0){
+                PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFile));
+                for (double val : histogram) {
+                    outWriterhistMds.print(val+",");
+                }
+                outWriterhistMds.flush();
+                outWriterhistMds.close();
+
+
+                //60
+                PrintWriter outWriterhist60 = new PrintWriter(new FileWriter(outFile2));
+                for (double val : histogram60) {
+                    outWriterhist60.print(val+",");
                 }
 
-
+                outWriterhist60.flush();
+                outWriterhist60.close();
             }
+
+//            for (int i = 0; i < filesPerProc; i++) {
+//                int fileIndex = ParallelOps.worldProcRank * filesPerProc + i;
+//                String fileId = (fileIndex < 100) ? "0" : "";
+//                fileId += (fileIndex < 10) ? "0" + fileIndex : "" + fileIndex;
+//                String filePath = fileDir + filePrefirx + fileId;
+//                BufferedReader bf = new BufferedReader(new FileReader(filePath));
+//                String line = null;
+//                String splits[];
+//                while ((line = bf.readLine()) != null) {
+//                    splits = line.split("\\s+");
+//                    double value = Double.valueOf(splits[2]);
+//                    sdsum += (value - mean) * (value - mean);
+//                }
+//
+//
+//            }
 
 
             sdsum = ParallelOps.allReduce(sdsum);
