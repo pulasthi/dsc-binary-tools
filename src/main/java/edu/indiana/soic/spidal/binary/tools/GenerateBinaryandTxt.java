@@ -31,7 +31,7 @@ public class GenerateBinaryandTxt {
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < D; j++) {
                     double v = Math.random();
-                    input[i] = v;
+                    input[i*j + j] = v;
                     if(j < D - 1){
                         outWriter.print(v+",\t");
                     }else{
