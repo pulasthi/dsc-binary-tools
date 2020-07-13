@@ -35,7 +35,6 @@ public class DistanceSamplerForDL {
     private static void extractIndexList(int[] indexList, String inputFile, String outFile, int numPoints, int K) {
         try(FileChannel fc = (FileChannel) Files
                 .newByteChannel(Paths.get(inputFile), StandardOpenOption.READ)) {
-            ByteBuffer byteBuffer = ByteBuffer.allocate((int)fc.size());
             FileChannel out = new FileOutputStream(outFile).getChannel();
             ByteBuffer bufferOut =  ByteBuffer.allocate(numPoints*K*2);
             if (endianness.equals(ByteOrder.BIG_ENDIAN)) {
@@ -46,25 +45,24 @@ public class DistanceSamplerForDL {
             bufferOut.clear();
             ShortBuffer shortOutputBuffer = bufferOut.asShortBuffer();
 
+            ByteBuffer byteBuffer = ByteBuffer.allocate(numPoints*2);
             if(endianness.equals(ByteOrder.BIG_ENDIAN)){
                 byteBuffer.order(ByteOrder.BIG_ENDIAN);
             }else{
                 byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
             }
-            fc.read(byteBuffer);
-            byteBuffer.flip();
-
-
-            ShortBuffer buffer = byteBuffer.asShortBuffer();
             short[] shortArray = new short[numPoints];
             short[] shortArrayOut = new short[K];
             for (int i = 0; i < numPoints; i++) {
-
+                fc.read(byteBuffer);
+                byteBuffer.flip();
+                ShortBuffer buffer = byteBuffer.asShortBuffer();
                 buffer.get(shortArray);
                 for (int j = 0; j < K; j++) {
                     shortArrayOut[j] = shortArray[indexList[j]];
                 }
                 shortOutputBuffer.put(shortArrayOut);
+                byteBuffer.clear();
             }
 
             out.write(bufferOut);
