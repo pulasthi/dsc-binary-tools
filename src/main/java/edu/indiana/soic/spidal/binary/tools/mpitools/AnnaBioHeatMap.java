@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class AnnaBioHeatMap {
-    private static ByteOrder endianness = ByteOrder.BIG_ENDIAN;
+    private static ByteOrder endianness = ByteOrder.LITTLE_ENDIAN;
 
     public static void main(String[] args) {
         try {
