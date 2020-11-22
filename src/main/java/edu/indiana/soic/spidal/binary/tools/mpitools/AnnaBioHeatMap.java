@@ -34,7 +34,7 @@ public class AnnaBioHeatMap {
             double max = 0.0;
             double min = 0.0;
             double minOri = 0.0;
-            double maxOri = 0.0;
+            double maxOri = 0.499984740745262;
             int histoSize = 100;
             double heatmap[] = new double[histoSize*histoSize];
             double histtroOri[] = new double[histoSize];
@@ -125,13 +125,11 @@ public class AnnaBioHeatMap {
                             }
                         }
 
-                        double valueOri = (double)shortArray[col]/Short.MAX_VALUE;
-                        if(valueOri < 0 || valueOri > 1.0){
-                            throw new IllegalStateException("Got incorrect value for value : " + valueOri);
+                        double tempOri = (double)shortArray[col]/Short.MAX_VALUE;
+                        if(tempOri < 0 || tempOri > 1.0){
+                            throw new IllegalStateException("Got incorrect value for value : " + tempOri);
                         }
-                        if(valueOri > maxOri){
-                            maxOri = valueOri;
-                        }
+                        double valueOri = (tempOri - minOri) / (maxOri - minOri);
                         double tempMDS = euclideanDist(points[row], points[col]);
                         double valueMDS = (tempMDS - min) / (max - min);
 
