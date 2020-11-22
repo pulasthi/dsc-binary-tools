@@ -100,6 +100,9 @@ public class AnnaBioHeatMap {
                 byte[] temp = new byte[numPoints*Short.BYTES];
                 Buffer buffer = null;
                 for (int row = start; row < end; row++) {
+                    if(ParallelOps.worldProcRank == 0 && row%100 == 0){
+                        System.out.println("Row : " + row);
+                    }
                     byteBuffer.clear();
                     rmaf.read(temp);
                     byteBuffer.put(temp);
