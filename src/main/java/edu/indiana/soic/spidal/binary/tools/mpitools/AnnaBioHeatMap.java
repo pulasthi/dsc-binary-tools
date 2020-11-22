@@ -154,9 +154,9 @@ public class AnnaBioHeatMap {
 
             if (ParallelOps.worldProcRank == 0) {
 
-                PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "/" + "heatmap.txt"));
-                PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "/" + "histoMDS.txt"));
-                PrintWriter outWriterhistOir = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "/" + "histoOri.txt"));
+                PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "heatmap.txt"));
+                PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "histoMDS.txt"));
+                PrintWriter outWriterhistOir = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "histoOri.txt"));
 
                 for (double val : histtroMDS) {
                     outWriterhistMds.print(val+",");
