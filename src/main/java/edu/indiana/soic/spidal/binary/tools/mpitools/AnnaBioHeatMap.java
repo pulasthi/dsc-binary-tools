@@ -24,6 +24,7 @@ public class AnnaBioHeatMap {
             String mdspoints = args[1];
             String distanceFile = args[2];
             String outFileDir = args[3];
+            String outFilePrefix = Paths.get(distanceFile).getFileName().toString().replace(".txt", "");
             double[][] points = new double[numPoints][3];
             Map<Integer, Integer> indexMap = new HashMap<Integer, Integer>();
             int pointsPerProc = numPoints/para;
@@ -151,9 +152,9 @@ public class AnnaBioHeatMap {
 
             if (ParallelOps.worldProcRank == 0) {
 
-                PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir + "/" + "heatmap.txt"));
-                PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir + "/" + "histoMDS.txt"));
-                PrintWriter outWriterhistOir = new PrintWriter(new FileWriter(outFileDir + "/" + "histoOri.txt"));
+                PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "/" + "heatmap.txt"));
+                PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "/" + "histoMDS.txt"));
+                PrintWriter outWriterhistOir = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "/" + "histoOri.txt"));
 
                 for (double val : histtroMDS) {
                     outWriterhistMds.print(val+",");
