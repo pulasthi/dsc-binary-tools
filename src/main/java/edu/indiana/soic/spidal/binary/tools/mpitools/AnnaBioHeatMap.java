@@ -31,10 +31,10 @@ public class AnnaBioHeatMap {
             Map<Integer, Integer> indexMap = new HashMap<Integer, Integer>();
             int pointsPerProc = numPoints/para;
             ParallelOps.worldProcsComm.barrier();
-            double max = 1.0;
+            double max = 0.0;
             double min = 0.0;
             double minOri = 0.0;
-            double maxOri = 1.0;
+            double maxOri = 0.0;
             int histoSize = 100;
             double heatmap[] = new double[histoSize*histoSize];
             double histtroOri[] = new double[histoSize];
@@ -129,6 +129,9 @@ public class AnnaBioHeatMap {
                         if(valueOri < 0 || valueOri > 1.0){
                             throw new IllegalStateException("Got incorrect value for value : " + valueOri);
                         }
+                        if(valueOri > maxOri){
+                            maxOri = valueOri;
+                        }
                         double tempMDS = euclideanDist(points[row], points[col]);
                         double valueMDS = (tempMDS - min) / (max - min);
 
@@ -151,7 +154,9 @@ public class AnnaBioHeatMap {
             ParallelOps.allReduce(histtroMDS, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(histtroOri, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(heatmap, MPI.SUM, ParallelOps.worldProcsComm);
+            maxOri = ParallelOps.allReduceMax(maxOri);
 
+            System.out.println("MAX Original " + maxOri);
             if (ParallelOps.worldProcRank == 0) {
 
                 PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "heatmap.txt"));
