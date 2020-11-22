@@ -32,9 +32,10 @@ public class AnnaBioHeatMap {
             double min = 0.0;
             double minOri = 0.0;
             double maxOri = 1.0;
-            double heatmap[] = new double[1000*1000];
-            double histtroOri[] = new double[1000];
-            double histtroMDS[] = new double[1000];
+            int histoSize = 100;
+            double heatmap[] = new double[histoSize*histoSize];
+            double histtroOri[] = new double[histoSize];
+            double histtroMDS[] = new double[histoSize];
             try {
                 //read points
                 BufferedReader bf = new BufferedReader(new FileReader(mdspoints));
@@ -129,15 +130,15 @@ public class AnnaBioHeatMap {
                         double valueMDS = (tempMDS - min) / (max - min);
 
 
-                        int mdsindex_i = (int) Math.floor(valueMDS * 1000);
-                        int orindex_j = (int) Math.floor(valueOri * 1000);
+                        int mdsindex_i = (int) Math.floor(valueMDS * histoSize);
+                        int orindex_j = (int) Math.floor(valueOri * histoSize);
 
-                        if (mdsindex_i == 1000) mdsindex_i -= 1;
-                        if (orindex_j == 1000) orindex_j -= 1;
+                        if (mdsindex_i == histoSize) mdsindex_i -= 1;
+                        if (orindex_j == histoSize) orindex_j -= 1;
 
                         histtroOri[orindex_j]++;
                         histtroMDS[mdsindex_i]++;
-                        heatmap[mdsindex_i * 1000 + orindex_j] += 1;
+                        heatmap[mdsindex_i * histoSize + orindex_j] += 1;
                     }
                 }
             } catch (IOException e) {
@@ -162,9 +163,9 @@ public class AnnaBioHeatMap {
                     outWriterhistOir.print(val+",");
                 }
 
-                for (int i = 0; i < 1000; i++) {
-                    for (int j = 0; j < 1000; j++) {
-                        double v = heatmap[i*1000 + j];
+                for (int i = 0; i < histoSize; i++) {
+                    for (int j = 0; j < histoSize; j++) {
+                        double v = heatmap[i*histoSize + j];
                         outWriter.print(v + ",");
                     }
                     outWriter.print("\n");
