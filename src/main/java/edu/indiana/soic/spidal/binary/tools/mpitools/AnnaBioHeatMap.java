@@ -24,7 +24,9 @@ public class AnnaBioHeatMap {
             String mdspoints = args[1];
             String distanceFile = args[2];
             String outFileDir = args[3];
-            String outFilePrefix = Paths.get(distanceFile).getFileName().toString().replace(".txt", "");
+            String pointFileName = Paths.get(mdspoints).getFileName().toString();
+            int iend = pointFileName.indexOf(".");
+            String outFilePrefix = pointFileName.substring(0, iend);
             double[][] points = new double[numPoints][3];
             Map<Integer, Integer> indexMap = new HashMap<Integer, Integer>();
             int pointsPerProc = numPoints/para;
