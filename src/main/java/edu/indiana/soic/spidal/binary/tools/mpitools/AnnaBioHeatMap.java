@@ -100,7 +100,7 @@ public class AnnaBioHeatMap {
                 byte[] temp = new byte[numPoints*Short.BYTES];
                 Buffer buffer = null;
                 for (int row = start; row < end; row++) {
-                    if(row > 170264) continue;
+                    if(row > 170263) continue;
 
                     if(ParallelOps.worldProcRank == 0 && row%100 == 0){
                         System.out.println("Row : " + row);
@@ -113,7 +113,7 @@ public class AnnaBioHeatMap {
                     short[] shortArray = new short[numPoints];
                     ((ShortBuffer)buffer).get(shortArray);
                     for (int col = 0; col < numPoints; col++) {
-                        if(col > 170264) continue;
+                        if(col > 170263) continue;
                         //check to make sure correct read
                         if(col == row){
                             if((double)shortArray[col]/Short.MAX_VALUE != 0.0){
