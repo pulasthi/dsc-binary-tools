@@ -12,6 +12,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLOutput;
 
 /**
  * Given a bin file and a K (number of references)
@@ -27,7 +28,8 @@ public class DistanceSamplerForDL {
         int K = Integer.parseInt(args[2]);
         int numPoitns = Integer.parseInt((args[3]));
         endianness =  args[4].equals("big") ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN;
-        int[] indexList = generateIndexList(K, numPoitns);
+        int space = Integer.parseInt(args[5]);
+        int[] indexList = generateIndexList(K, numPoitns, space);
 
         extractIndexList(indexList, inputFile, outFile, numPoitns, K);
     }
@@ -72,8 +74,14 @@ public class DistanceSamplerForDL {
         }
     }
 
-    private static int[] generateIndexList(int K, int numPoints){
+    private static int[] generateIndexList(int K, int numPoints, int space){
         int spacing = numPoints/K;
+        if(spacing < space){
+            System.out.printf("Spacing too big using " + spacing + " instead");
+        }else{
+            spacing = space;
+        }
+
         int[] indexList = new int[K];
         int index = 0;
         for (int i = 0; i < numPoints; i += spacing) {
