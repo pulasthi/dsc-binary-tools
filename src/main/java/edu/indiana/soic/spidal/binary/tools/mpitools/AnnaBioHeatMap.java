@@ -39,6 +39,8 @@ public class AnnaBioHeatMap {
             double heatmap[] = new double[histoSize*histoSize];
             double histtroOri[] = new double[histoSize];
             double histtroMDS[] = new double[histoSize];
+            double mdsSum = 0.0;
+
             try {
                 //read points
                 BufferedReader bf = new BufferedReader(new FileReader(mdspoints));
@@ -98,7 +100,6 @@ public class AnnaBioHeatMap {
             }else{
                 byteBuffer.order(ByteOrder.LITTLE_ENDIAN);
             }
-
             try(RandomAccessFile rmaf = new RandomAccessFile(Paths.get(distanceFile).toString(), "r")) {
                 rmaf.seek(startPos);
                 byte[] temp = new byte[numPoints*Short.BYTES];
@@ -132,7 +133,7 @@ public class AnnaBioHeatMap {
                         double valueOri = (tempOri - minOri) / (maxOri - minOri);
                         double tempMDS = euclideanDist(points[row], points[col]);
                         double valueMDS = (tempMDS - min) / (max - min);
-
+                        mdsSum += (valueOri - valueMDS) * (valueOri - valueMDS);
 
                         int mdsindex_i = (int) Math.floor(valueMDS * histoSize);
                         int orindex_j = (int) Math.floor(valueOri * histoSize);
@@ -152,10 +153,12 @@ public class AnnaBioHeatMap {
             ParallelOps.allReduce(histtroMDS, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(histtroOri, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(heatmap, MPI.SUM, ParallelOps.worldProcsComm);
+            ParallelOps.allReduce(mdsSum);
             maxOri = ParallelOps.allReduceMax(maxOri);
 
-            System.out.println("MAX Original " + maxOri);
+            //System.out.println("MAX Original " + maxOri);
             if (ParallelOps.worldProcRank == 0) {
+                System.out.println(pointFileName + " MDS Sum : " + mdsSum);
 
                 PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "heatmap.txt"));
                 PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "histoMDS.txt"));
