@@ -9,6 +9,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.ShortBuffer;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +40,7 @@ public class AnnaBioHeatMap {
             double heatmap[] = new double[histoSize*histoSize];
             double histtroOri[] = new double[histoSize];
             double histtroMDS[] = new double[histoSize];
-            double mdsSum = 0.0;
+            double mdsSum[] = new double[5];
 
             try {
                 //read points
@@ -93,7 +94,7 @@ public class AnnaBioHeatMap {
             min = ParallelOps.allReduceMax(min);
             count = ParallelOps.allReduce(count);
             long startPos = ((long)start)*numPoints*Short.BYTES;
-            System.out.println("Max : " + max + ":  Min : " + min + ":  Count : " + count);
+            //System.out.println("Max : " + max + ":  Min : " + min + ":  Count : " + count);
             ByteBuffer byteBuffer = ByteBuffer.allocate(numPoints*Short.BYTES);
             if(endianness.equals(ByteOrder.BIG_ENDIAN)){
                 byteBuffer.order(ByteOrder.BIG_ENDIAN);
@@ -107,9 +108,9 @@ public class AnnaBioHeatMap {
                 for (int row = start; row < end; row++) {
                     if(row > 170263) continue;
 
-                    if(ParallelOps.worldProcRank == 0 && row%100 == 0){
-                        System.out.println("Row : " + row);
-                    }
+//                    if(ParallelOps.worldProcRank == 0 && row%100 == 0){
+//                        System.out.println("Row : " + row);
+//                    }
                     byteBuffer.clear();
                     rmaf.read(temp);
                     byteBuffer.put(temp);
@@ -133,7 +134,10 @@ public class AnnaBioHeatMap {
                         double valueOri = (tempOri - minOri) / (maxOri - minOri);
                         double tempMDS = euclideanDist(points[row], points[col]);
                         double valueMDS = (tempMDS - min) / (max - min);
-                        mdsSum += (valueOri - valueMDS) * (valueOri - valueMDS);
+
+                        double mdsSumtemp = (valueOri - valueMDS) * (valueOri - valueMDS);
+                        int mdsbin = (int) Math.floor(mdsSumtemp/0.2);
+                        mdsSum[mdsbin] += mdsSumtemp;
 
                         int mdsindex_i = (int) Math.floor(valueMDS * histoSize);
                         int orindex_j = (int) Math.floor(valueOri * histoSize);
@@ -153,12 +157,12 @@ public class AnnaBioHeatMap {
             ParallelOps.allReduce(histtroMDS, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(histtroOri, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(heatmap, MPI.SUM, ParallelOps.worldProcsComm);
-            ParallelOps.allReduce(mdsSum);
+            ParallelOps.allReduce(mdsSum, MPI.SUM, ParallelOps.worldProcsComm);
             maxOri = ParallelOps.allReduceMax(maxOri);
 
             //System.out.println("MAX Original " + maxOri);
             if (ParallelOps.worldProcRank == 0) {
-                System.out.println(pointFileName + " MDS Sum : " + mdsSum);
+                System.out.println(pointFileName + " MDS Sum : " + Arrays.toString(mdsSum));
 
                 PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "heatmap.txt"));
                 PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "histoMDS.txt"));
