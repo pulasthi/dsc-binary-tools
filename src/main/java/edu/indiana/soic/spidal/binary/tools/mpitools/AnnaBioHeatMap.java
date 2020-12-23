@@ -136,7 +136,7 @@ public class AnnaBioHeatMap {
                         double valueMDS = (tempMDS - min) / (max - min);
 
                         double mdsSumtemp = (valueOri - valueMDS) * (valueOri - valueMDS);
-                        int mdsbin = (int) Math.floor(mdsSumtemp/0.2);
+                        int mdsbin = (int) Math.floor(valueOri/0.2);
                         mdsSum[mdsbin] += mdsSumtemp;
 
                         int mdsindex_i = (int) Math.floor(valueMDS * histoSize);
