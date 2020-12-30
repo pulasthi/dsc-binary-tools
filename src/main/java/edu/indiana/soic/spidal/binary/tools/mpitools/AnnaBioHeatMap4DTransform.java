@@ -44,6 +44,8 @@ public class AnnaBioHeatMap4DTransform {
             double histtroOri[] = new double[histoSize];
             double histtroMDS[] = new double[histoSize];
             double mdsSum[] = new double[5];
+            double mdsCount[] = new double[10];
+            int smallValues = 0;
 
             try {
                 //read points
@@ -146,6 +148,15 @@ public class AnnaBioHeatMap4DTransform {
                         }
                         mdsSum[mdsbin] += mdsSumtemp;
 
+                        int mdsCountbin = (int) Math.floor(valueOri/0.1);
+                        if(mdsbin == 10) {
+                            mdsbin = 9;
+                        }
+                        mdsCount[mdsCountbin] += 1;
+                        if(valueOri < 0.01){
+                            smallValues++;
+                        }
+
                         int mdsindex_i = (int) Math.floor(valueMDS * histoSize);
                         int orindex_j = (int) Math.floor(valueOri * histoSize);
 
@@ -165,9 +176,13 @@ public class AnnaBioHeatMap4DTransform {
             ParallelOps.allReduce(histtroOri, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(heatmap, MPI.SUM, ParallelOps.worldProcsComm);
             ParallelOps.allReduce(mdsSum, MPI.SUM, ParallelOps.worldProcsComm);
+            ParallelOps.allReduce(mdsCount, MPI.SUM, ParallelOps.worldProcsComm);
+            smallValues = ParallelOps.allReduce(smallValues);
 
             if (ParallelOps.worldProcRank == 0) {
                 System.out.println(pointFileName + " MDS Sum : " + Arrays.toString(mdsSum));
+                System.out.println(pointFileName + " MDS Count : " + Arrays.toString(mdsCount));
+                System.out.println(pointFileName + " MDS Small Vals : " + smallValues);
 
                 PrintWriter outWriter = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "heatmap.txt"));
                 PrintWriter outWriterhistMds = new PrintWriter(new FileWriter(outFileDir +"/" + outFilePrefix + "_" + "histoMDS.txt"));
