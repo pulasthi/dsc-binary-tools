@@ -150,7 +150,7 @@ public class AnnaBioHeatMap4DTransform {
 
                         int mdsCountbin = (int) Math.floor(valueOri/0.1);
                         if(mdsbin == 10) {
-                            mdsbin = 9;
+                            mdsCountbin = 9;
                         }
                         mdsCount[mdsCountbin] += 1;
                         if(valueOri < 0.01){
